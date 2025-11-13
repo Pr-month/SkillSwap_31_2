@@ -1,4 +1,6 @@
+import { Role } from "src/users/role.enums";
+
 export type TJwtPayload = {
-  _id: string;
-  role: 'user' | 'admin'; // нужно импортировать роль
+  sub: string;
+  role: Role; // нужно импортировать роль
 };
