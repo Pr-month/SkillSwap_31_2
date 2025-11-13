@@ -10,12 +10,13 @@ import { DatabaseModule } from './database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
 import { Auth } from './auth/entities/auth.entity';
+import { dbConfiguration } from './config/db.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [configuration],
+      load: [configuration, dbConfiguration],
     }),
     JwtModule.registerAsync({
       global: true,
