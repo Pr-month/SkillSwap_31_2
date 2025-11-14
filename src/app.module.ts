@@ -9,7 +9,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { DatabaseModule } from './database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
-import { Auth } from './auth/entities/auth.entity';
 import { dbConfiguration } from './config/db.config';
 
 @Module({
@@ -27,7 +26,6 @@ import { dbConfiguration } from './config/db.config';
       }),
     }),
     DatabaseModule,
-    TypeOrmModule.forFeature([User, Auth]),
     AuthModule,
     UsersModule,
   ],
