@@ -6,12 +6,17 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { configuration, IConfig } from './config/app.config';
 import { JwtModule } from '@nestjs/jwt';
+import { DatabaseModule } from './database/database.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/entities/user.entity';
+import { Auth } from './auth/entities/auth.entity';
+import { dbConfiguration } from './config/db.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [configuration],
+      load: [configuration, dbConfiguration],
     }),
     JwtModule.registerAsync({
       global: true,
@@ -21,6 +26,8 @@ import { JwtModule } from '@nestjs/jwt';
         signOptions: { expiresIn: config.secretExpiresIn },
       }),
     }),
+    DatabaseModule,
+    TypeOrmModule.forFeature([User, Auth]),
     AuthModule,
     UsersModule,
   ],
