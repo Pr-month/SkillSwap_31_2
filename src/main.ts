@@ -7,4 +7,4 @@ async function bootstrap() {
   const config = app.get<IConfig>(configuration.KEY);
   await app.listen(config.port);
 }
-bootstrap();
+void bootstrap();
