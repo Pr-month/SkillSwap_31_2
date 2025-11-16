@@ -8,18 +8,13 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UserResponseDto } from './dto/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { TJwtPayload } from '../auth/type';
-
-export type TAuthResponse = Request & {
-  user: TJwtPayload;
-};
+import { TAuthResponse } from '../auth/type';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   create() {
@@ -27,24 +22,18 @@ export class UsersController {
   }
 
   @Get()
-  async findAll(): Promise<{ total: number; users: UserResponseDto[] }> {
-    const users = await this.usersService.findAll();
-    return {
-      total: users.length,
-      users: users,
-    };
+  async findAll() {
+    return await this.usersService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<UserResponseDto> {
+  async findOne(@Param('id') id: string) {
     return await this.usersService.findOne(id);
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getCurrentUser(
-    @Request() req: TAuthResponse,
-  ): Promise<UserResponseDto> {
+  async getCurrentUser(@Request() req: TAuthResponse) {
     const userId = req.user.sub;
     return this.usersService.getCurrentUser(userId);
   }
