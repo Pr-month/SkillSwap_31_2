@@ -4,3 +4,7 @@ export type TJwtPayload = {
   sub: string;
   role: Role;
 };
+
+export type TAuthResponse = Request & {
+  user: TJwtPayload;
+};
