@@ -1,22 +1,43 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  BeforeInsert,
+  BeforeUpdate,
+} from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
-export type TUserGender = "male" | "female" | "not specified";
+export type TUserGender = 'male' | 'female' | 'not specified';
 
-export type TUserRole = "ADMIN" | "USER";
+export type TUserRole = 'ADMIN' | 'USER';
 
 export class User {
-
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   name: string;
 
-  @Column()
+  @Column({
+    unique: true,
+    type: 'varchar',
+    length: 255,
+  })
   email: string;
-  
+
   @Column()
   password: string;
+
+  @BeforeInsert()
+  async beforeInsert() {
+    this.password = await bcrypt.hash(this.password);
+  }
+
+  @BeforeUpdate()
+  async beforeUpdate() {
+    this.password = await bcrypt.hash(this.password);
+  }
 
   @Column()
   about: string;
@@ -28,12 +49,11 @@ export class User {
   city: string;
 
   @Column({
-    default: "not specified",
-    type: "enum",
-    enum: ["male", "female", "not specified"]
+    default: 'not specified',
+    type: 'enum',
+    enum: ['male', 'female', 'not specified'],
   })
   gender: TUserGender;
-
 
   @Column()
   avatar: string;
@@ -48,9 +68,9 @@ export class User {
   favoriteSkills : */
 
   @Column({
-    default: "USER",
-    type: "enum",
-    enum: ["ADMIN", "USER"]
+    default: 'USER',
+    type: 'enum',
+    enum: ['ADMIN', 'USER'],
   })
   role: TUserRole;
 
