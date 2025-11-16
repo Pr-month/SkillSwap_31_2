@@ -1,6 +1,10 @@
-import { Role } from "src/users/role.enums";
+import { Role } from 'src/users/role.enums';
 
 export type TJwtPayload = {
   sub: string;
   role: Role; // нужно импортировать роль
+};
+
+export type TAuthResponse = Request & {
+  user: TJwtPayload;
 };
