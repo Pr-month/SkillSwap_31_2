@@ -6,7 +6,10 @@ import { LocalGuard } from './guards/local.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly usersService: UsersService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post('register')
   async register(@Body() createAuthDto: CreateAuthDto, @Res() res) {
