@@ -1,11 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserResponseDto } from './dto/user.dto';
 
-
 @Injectable()
 export class UsersService {
-
-  constructor(private userRepository: any) { };
+  constructor(private userRepository: any) {}
 
   create() {
     return `This action adds a new user`;
@@ -14,7 +12,7 @@ export class UsersService {
   async findAll(): Promise<UserResponseDto[]> {
     const users = await this.userRepository.findAll();
 
-    if (!users || users.length === 0) {
+    if (!users) {
       throw new NotFoundException('Список пользователей пуст');
     }
     return users;
@@ -22,7 +20,7 @@ export class UsersService {
 
   async findOne(id: string): Promise<UserResponseDto> {
     const user = await this.userRepository.findById(id);
-    if (!user || user.length === 0) {
+    if (!user) {
       throw new NotFoundException(`Пользователь с ID ${id} не найден`);
     }
     return user;

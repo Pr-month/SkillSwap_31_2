@@ -1,10 +1,25 @@
-import { Controller, Delete, Get, Param, Patch, Post, Request } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserResponseDto } from './dto/user.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { TJwtPayload } from '../auth/type';
+
+export type TAuthResponse = Request & {
+  user: TJwtPayload;
+};
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { };
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
   create() {
@@ -26,8 +41,11 @@ export class UsersController {
   }
 
   @Get('me')
-  async getCurrentUser(@Request() req): Promise<UserResponseDto> {
-    const userId = req.user.id
+  @UseGuards(JwtAuthGuard)
+  async getCurrentUser(
+    @Request() req: TAuthResponse,
+  ): Promise<UserResponseDto> {
+    const userId = req.user.sub;
     return this.usersService.getCurrentUser(userId);
   }
 
@@ -41,4 +59,3 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 }
-
