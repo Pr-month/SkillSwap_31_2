@@ -1,23 +1,19 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TAuthResponse } from '../auth/type';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UpdatePasswordDto } from './dto/update-user.dto';
-import { TJwtPayload } from '../auth/type';
-
-export type TAuthResponse = Request & {
-  user: TJwtPayload;
-};
+import { UpdatePasswordDto } from './dto/update-user-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -52,12 +48,6 @@ export class UsersController {
     @Body() updatePassword: UpdatePasswordDto
   ): Promise<{ message: string }> {
     const userId = req.user.sub;
-    if (!userId) {
-      throw new NotFoundException('ID пользователя не указан');
-    }
-    if (!updatePassword) {
-      throw new NotFoundException('Указаны не все данные для обновленя пароля');
-    }
     await this.usersService.updateUserPassword(userId, updatePassword);
     return { message: 'Пароль успешно изменен' };
   }
