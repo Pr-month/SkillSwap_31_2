@@ -5,7 +5,10 @@ import { TJwtPayload } from '../type';
 import { IJwtConfig, jwtConfig } from 'src/config/jwt.config';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(
     @Inject(jwtConfig.KEY)
     private readonly configService: IJwtConfig,
@@ -13,7 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.secretToken,
+      secretOrKey: configService.refreshToken,
     });
   }
 
