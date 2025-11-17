@@ -17,8 +17,9 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) { }
 
-  create() {
-    return `This action adds a new user`;
+  async create(user: CreateUserDto) {
+    const createdUser = await this.usersRepository.create(user);
+    return await this.usersRepository.save(createdUser);
   }
 
   async findAll(): Promise<User[]> {
@@ -77,5 +78,9 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async findByEmail(email: string) {
+    return await this.usersRepository.findOne({ where: { email } });
   }
 }
