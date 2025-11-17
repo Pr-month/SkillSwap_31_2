@@ -22,15 +22,9 @@ export class AuthService {
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload);
 
-    res.cookie('REFRESH_TOKEN', refreshToken, {
-      sameSite: 'None',
-      secure: true,
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
-
     return {
       access_token: accessToken,
+      refresh_token: refreshToken,
     };
   }
 

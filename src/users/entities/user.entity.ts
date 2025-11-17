@@ -8,7 +8,11 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-export type TUserGender = 'male' | 'female' | 'not specified';
+export enum UserGender {
+  'male',
+  'female',
+  'not specified',
+}
 
 export type TUserRole = 'ADMIN' | 'USER';
 
@@ -31,12 +35,7 @@ export class User {
 
   @BeforeInsert()
   async beforeInsert() {
-    this.password = await bcrypt.hash(this.password);
-  }
-
-  @BeforeUpdate()
-  async beforeUpdate() {
-    this.password = await bcrypt.hash(this.password);
+    this.password = await bcrypt.hash(this.password, 67);
   }
 
   @Column()
@@ -53,7 +52,7 @@ export class User {
     type: 'enum',
     enum: ['male', 'female', 'not specified'],
   })
-  gender: TUserGender;
+  gender: UserGender;
 
   @Column()
   avatar: string;

@@ -1,4 +1,4 @@
-import type { TUserGender } from '../../users/entities/user.entity';
+import type { UserGender } from '../../users/entities/user.entity';
 import {
   IsNotEmpty,
   IsString,
@@ -19,42 +19,50 @@ export class CreateAuthDto {
   @MinLength(3)
   @MaxLength(32)
   name: string;
+
   @IsString()
   @IsNotEmpty()
   @MinLength(5)
   @MaxLength(255)
   @IsEmail()
   email: string;
+
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
   @MaxLength(4096)
   password: string;
+
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
   @MaxLength(512)
   about: string;
+
   @IsDateString()
   @IsNotEmpty()
   @MinLength(6)
   @MaxLength(128)
   birthday: Date;
+
   @IsString()
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(512)
   city: string;
+
   @IsEnum(['male', 'female', 'not specified'])
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(16)
-  gender: TUserGender;
+  gender: UserGender;
+
   @IsFQDN()
   @IsNotEmpty()
   @MinLength(5)
   @MaxLength(1024)
   avatar: string;
+  /*
   @IsArray()
   @IsNotEmpty()
   @ArrayUnique()
@@ -62,6 +70,8 @@ export class CreateAuthDto {
   @ArrayMaxSize(255)
   @MaxLength(128, { each: true })
   skills: string[];
+*/
+  /*
   @IsArray()
   @IsNotEmpty()
   @ArrayUnique()
@@ -69,6 +79,8 @@ export class CreateAuthDto {
   @ArrayMaxSize(255)
   @MaxLength(128, { each: true })
   wantToLearn: string[];
+*/
+  /*
   @IsArray()
   @IsNotEmpty()
   @ArrayUnique()
@@ -76,4 +88,5 @@ export class CreateAuthDto {
   @ArrayMaxSize(255)
   @MaxLength(128, { each: true })
   favoriteSkills: string[];
+*/
 }
