@@ -9,17 +9,17 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   @Post('register')
-  async register(@Body() createAuthDto: CreateAuthDto, @Res() res) {
+  async register(@Body() createAuthDto: CreateAuthDto) {
     const user = await this.usersService.create(createAuthDto);
-    return await this.authService.auth(user, res);
+    return await this.authService.auth(user);
   }
 
   @UseGuards(LocalGuard)
   @Post('login')
-  async login(@Req() req, @Res() res) {
-    return await this.authService.auth(req.user, res);
+  async login(@Req() req) {
+    return await this.authService.auth(req.user);
   }
 }

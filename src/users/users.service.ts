@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import * as bcrypt from 'bcryptjs';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,8 +19,8 @@ export class UsersService {
   ) { }
 
   async create(user: CreateUserDto) {
-    const createdUser = await this.usersRepository.create(user);
-    return await this.usersRepository.save(createdUser);
+    const createdUser = await this.userRepository.create(user);
+    return await this.userRepository.save(createdUser);
   }
 
   async findAll(): Promise<User[]> {
@@ -31,7 +32,7 @@ export class UsersService {
     return users;
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(`Пользователь с ID ${id} не найден`);
@@ -39,13 +40,13 @@ export class UsersService {
     return user;
   }
 
-  async getCurrentUser(userId: string): Promise<User> {
+  async getCurrentUser(userId: number): Promise<User> {
     const user = await this.findOne(userId);
     return user;
   }
 
   async updateUserPassword(
-    userId: string,
+    userId: number,
     updatePassword: UpdatePasswordDto,
   ): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId }, select: ['id', 'password'] }) as Pick<User, 'id' | 'password'> | null;
@@ -81,6 +82,6 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return await this.usersRepository.findOne({ where: { email } });
+    return await this.userRepository.findOne({ where: { email } });
   }
 }

@@ -1,4 +1,3 @@
-import type { UserGender } from '../../users/entities/user.entity';
 import {
   IsNotEmpty,
   IsString,
@@ -12,6 +11,7 @@ import {
   ArrayUnique,
   ArrayMaxSize,
 } from 'class-validator';
+import { UserGender } from 'src/users/users.enums';
 
 export class CreateAuthDto {
   @IsString()

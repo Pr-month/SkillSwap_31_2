@@ -16,12 +16,7 @@ import { UpdatePasswordDto } from './dto/update-user-password.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-
-  @Post()
-  create() {
-    return this.usersService.create();
-  }
+  constructor(private readonly usersService: UsersService) { }
 
   @Get()
   async findAll() {
@@ -29,7 +24,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: number) {
     return await this.usersService.findOne(id);
   }
 

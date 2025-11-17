@@ -1,20 +1,10 @@
+import * as bcrypt from 'bcryptjs';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
   BeforeInsert,
-  BeforeUpdate,
+  Column,
+  PrimaryGeneratedColumn
 } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-
-export enum UserGender {
-  'male',
-  'female',
-  'not specified',
-}
-
-export type TUserRole = 'ADMIN' | 'USER';
+import { UserGender, Role } from '../users.enums';
 
 export class User {
   @PrimaryGeneratedColumn()
@@ -35,7 +25,7 @@ export class User {
 
   @BeforeInsert()
   async beforeInsert() {
-    this.password = await bcrypt.hash(this.password, 67);
+    this.password = await bcrypt.hash(this.password, process.env.HASH_SALT || 10);
   }
 
   @Column()
@@ -48,9 +38,9 @@ export class User {
   city: string;
 
   @Column({
-    default: 'not specified',
+    default: UserGender['not specified'],
     type: 'enum',
-    enum: ['male', 'female', 'not specified'],
+    enum: UserGender,
   })
   gender: UserGender;
 
@@ -67,11 +57,11 @@ export class User {
   favoriteSkills : */
 
   @Column({
-    default: 'USER',
+    default: Role.User,
     type: 'enum',
-    enum: ['ADMIN', 'USER'],
+    enum: Role,
   })
-  role: TUserRole;
+  role: Role;
 
   @Column()
   refreshToken: string;

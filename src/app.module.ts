@@ -7,8 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import { configuration } from './config/app.config';
 import { JwtModule } from '@nestjs/jwt';
 import { DatabaseModule } from './database/database.module';
-// import { TypeOrmModule } from '@nestjs/typeorm';
-// import { User } from './users/entities/user.entity';
 import { dbConfiguration } from './config/db.config';
 import { IJwtConfig, jwtConfig } from './config/jwt.config';
 
