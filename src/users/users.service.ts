@@ -1,14 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { UpdatePasswordDto } from './dto/update-user-password.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   create() {
     return `This action adds a new user`;
@@ -34,6 +41,34 @@ export class UsersService {
   async getCurrentUser(userId: string): Promise<User> {
     const user = await this.findOne(userId);
     return user;
+  }
+
+  async updateUserPassword(
+    userId: string,
+    updatePassword: UpdatePasswordDto,
+  ): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId }, select: ['id', 'password'] }) as Pick<User, 'id' | 'password'> | null;
+    if (!user) {
+      throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
+    }
+    const isOldPasswordValid = await bcrypt.compare(
+      updatePassword.oldPassword,
+      user.password,
+    );
+    if (!isOldPasswordValid) {
+      throw new UnauthorizedException('Неверный текущий пароль');
+    }
+    if (updatePassword.oldPassword === updatePassword.newPassword) {
+      throw new BadRequestException(
+        'Новый пароль должен отличаться от старого',
+      );
+    }
+    const hashedNewPassword = await bcrypt.hash(updatePassword.newPassword, 10);
+
+    await this.userRepository.update(
+      { id: userId },
+      { password: hashedNewPassword }
+    );
   }
 
   update(id: number) {
