@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -17,7 +16,7 @@ import { UpdatePasswordDto } from './dto/update-user-password.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   create() {
@@ -45,7 +44,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateUserPassword(
     @Request() req: TAuthResponse,
-    @Body() updatePassword: UpdatePasswordDto
+    @Body() updatePassword: UpdatePasswordDto,
   ): Promise<{ message: string }> {
     const userId = req.user.sub;
     await this.usersService.updateUserPassword(userId, updatePassword);
