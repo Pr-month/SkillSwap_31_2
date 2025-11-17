@@ -10,12 +10,16 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
-  imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    UsersModule
-  ],
+  imports: [PassportModule.register({ defaultStrategy: 'jwt' }), UsersModule],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard, JwtRefreshGuard, JwtStrategy, JwtRefreshStrategy, LocalStrategy],
+  providers: [
+    AuthService,
+    JwtAuthGuard,
+    JwtRefreshGuard,
+    JwtStrategy,
+    JwtRefreshStrategy,
+    LocalStrategy,
+  ],
   exports: [JwtAuthGuard, JwtRefreshGuard, PassportModule],
 })
-export class AuthModule { }
+export class AuthModule {}

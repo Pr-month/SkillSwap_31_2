@@ -1,9 +1,5 @@
 import * as bcrypt from 'bcryptjs';
-import {
-  BeforeInsert,
-  Column,
-  PrimaryGeneratedColumn
-} from 'typeorm';
+import { BeforeInsert, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { UserGender, Role } from '../users.enums';
 
 export class User {
@@ -25,7 +21,10 @@ export class User {
 
   @BeforeInsert()
   async beforeInsert() {
-    this.password = await bcrypt.hash(this.password, process.env.HASH_SALT || 10);
+    this.password = await bcrypt.hash(
+      this.password,
+      process.env.HASH_SALT || 10,
+    );
   }
 
   @Column()

@@ -1,7 +1,4 @@
-import {
-  Inject,
-  Injectable
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { configuration, IConfig } from 'src/config/app.config';
@@ -14,10 +11,13 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     @Inject(configuration.KEY)
-    private readonly appConfig: IConfig
-  ) { }
+    private readonly appConfig: IConfig,
+  ) {}
 
-  async auth(user: User) {
+  async auth(user: User): Promise<{
+    access_token: string;
+    refresh_token: string;
+  }> {
     const payload = { sub: user.id };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload);

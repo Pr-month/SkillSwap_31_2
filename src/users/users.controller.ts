@@ -5,18 +5,17 @@ import {
   Get,
   Param,
   Patch,
-  Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { TAuthResponse } from '../auth/type';
-import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { TAuthResponse } from '../auth/type';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Get()
   async findAll() {
