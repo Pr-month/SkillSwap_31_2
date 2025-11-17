@@ -4,23 +4,29 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
-import { configuration, IConfig } from './config/app.config';
+import { configuration } from './config/app.config';
 import { JwtModule } from '@nestjs/jwt';
+import { DatabaseModule } from './database/database.module';
+// import { TypeOrmModule } from '@nestjs/typeorm';
+// import { User } from './users/entities/user.entity';
+import { dbConfiguration } from './config/db.config';
+import { IJwtConfig, jwtConfig } from './config/jwt.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [configuration],
+      load: [configuration, dbConfiguration, jwtConfig],
     }),
     JwtModule.registerAsync({
       global: true,
-      inject: [configuration.KEY],
-      useFactory: (config: IConfig) => ({
+      inject: [jwtConfig.KEY],
+      useFactory: (config: IJwtConfig) => ({
         secret: config.secretToken,
         signOptions: { expiresIn: config.secretExpiresIn },
       }),
     }),
+    DatabaseModule,
     AuthModule,
     UsersModule,
   ],

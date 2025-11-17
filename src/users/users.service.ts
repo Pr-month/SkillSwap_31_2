@@ -1,24 +1,75 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import { User } from './entities/user.entity';
+import { UpdatePasswordDto } from './dto/update-user-password.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) { }
 
   async create(user: CreateUserDto) {
     const createdUser = await this.usersRepository.create(user);
     return await this.usersRepository.save(createdUser);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<User[]> {
+    const users = await this.userRepository.find();
+
+    if (!users) {
+      throw new NotFoundException('Список пользователей пуст');
+    }
+    return users;
   }
 
-  async findOne(id: number) {
-    return await this.usersRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`Пользователь с ID ${id} не найден`);
+    }
+    return user;
+  }
+
+  async getCurrentUser(userId: string): Promise<User> {
+    const user = await this.findOne(userId);
+    return user;
+  }
+
+  async updateUserPassword(
+    userId: string,
+    updatePassword: UpdatePasswordDto,
+  ): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId }, select: ['id', 'password'] }) as Pick<User, 'id' | 'password'> | null;
+    if (!user) {
+      throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
+    }
+    const isOldPasswordValid = await bcrypt.compare(
+      updatePassword.oldPassword,
+      user.password,
+    );
+    if (!isOldPasswordValid) {
+      throw new UnauthorizedException('Неверный текущий пароль');
+    }
+    if (updatePassword.oldPassword === updatePassword.newPassword) {
+      throw new BadRequestException(
+        'Новый пароль должен отличаться от старого',
+      );
+    }
+    const hashedNewPassword = await bcrypt.hash(updatePassword.newPassword, 10);
+
+    await this.userRepository.update(
+      { id: userId },
+      { password: hashedNewPassword }
+    );
   }
 
   update(id: number) {
