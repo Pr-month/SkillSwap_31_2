@@ -6,14 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { FindSkillsQueryDto } from './dto/find-skill.dto';
 
 @Controller('skills')
 export class SkillsController {
-  constructor(private readonly skillsService: SkillsService) {}
+  constructor(private readonly skillsService: SkillsService) { }
 
   @Post()
   create(@Body() createSkillDto: CreateSkillDto) {
@@ -21,8 +23,8 @@ export class SkillsController {
   }
 
   @Get()
-  findAll() {
-    return this.skillsService.findAll();
+  async findAll(@Query() query: FindSkillsQueryDto) {
+    return await this.skillsService.findAll(query);
   }
 
   @Get(':id')
