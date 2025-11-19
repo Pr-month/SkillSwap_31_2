@@ -1,0 +1,82 @@
+import { Injectable } from '@nestjs/common';
+import { FILE_TYPES, FILE_TYPES_SET } from './upload.controller';
+import { extname } from 'path';
+import { fileTypeFromFile } from 'file-type';
+import { readFile } from 'fs/promises';
+
+@Injectable()
+export class UploadService {
+  private types = FILE_TYPES;
+  private typesSet = FILE_TYPES_SET;
+
+  private SIGNATURES = {
+    PNG: [0x89, 0x50, 0x4e, 0x47],
+    JPEG: [0xff, 0xd8, 0xff],
+    GIF: [0x47, 0x49, 0x46],
+    SVG: [0x3c, 0x3f, 0x78, 0x6d, 0x6c], // <?xml
+    SVG_ALT: [0x3c, 0x73, 0x76, 0x67], // <svg
+  };
+
+  constructor() {}
+
+  async upload(file: Express.Multer.File) {
+    try {
+      if (!this.__isValidFormat(file)) {
+        return Promise.reject();
+      }
+      const isValidSignature = await this.__checkImageSignature(file);
+      if (!isValidSignature) {
+        return Promise.reject();
+      }
+      return {
+        originalName: file.originalname,
+        filename: file.filename,
+      };
+    } catch {
+      return Promise.reject();
+    }
+  }
+
+  private __isValidFormat(file: Express.Multer.File) {
+    return this.types
+      .map((type) => `.${type.split('/')[1]}`)
+      .includes(extname(file.path));
+  }
+
+  private async __checkImageSignature(
+    file: Express.Multer.File,
+  ): Promise<boolean> {
+    try {
+      const fileType = await fileTypeFromFile(file.path);
+      if (fileType) {
+        return this.typesSet.has(fileType.mime);
+      }
+      const buffer = await readFile(file.path);
+      const uintArray = new Uint8Array(buffer);
+      for (const sig of Object.keys(this.SIGNATURES)) {
+        if (this.__checkSignature(uintArray, this.SIGNATURES[sig])) {
+          return Promise.resolve(true);
+        }
+      }
+      return Promise.reject(false);
+    } catch {
+      return Promise.reject(false);
+    }
+  }
+
+  private __checkSignature(
+    uintArray: Uint8Array,
+    signature: number[],
+  ): boolean {
+    if (uintArray.length < signature.length) {
+      return false;
+    }
+
+    for (let i = 0; i < signature.length; i++) {
+      if (uintArray[i] !== signature[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
