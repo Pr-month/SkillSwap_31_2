@@ -1,6 +1,13 @@
 import { User } from 'src/users/entities/user.entity';
-import { Column, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
+@Entity('category')
 export class Category {
   @PrimaryGeneratedColumn()
   id: number;
@@ -8,13 +15,17 @@ export class Category {
   @Column()
   name: string;
 
-  @OneToOne(() => Category, (category) => category.id)
-  parent: Category;
+  @ManyToOne(() => Category, (category) => category.children)
+  parent?: Category;
 
   @OneToMany(() => Category, (category) => category.parent)
-  chuldren: Category[];
+  children?: Category[];
+
+  // @OneToMany(() => Skill, (skill) => skill.category)
+  // skils?: Skill[];
 }
 
+@Entity('skill')
 export class Skill {
   @PrimaryGeneratedColumn()
   id: number;
@@ -25,12 +36,14 @@ export class Skill {
   @Column()
   description: string;
 
-  @OneToOne(() => Category, (category) => category.id)
-  category: Category;
+  // @ManyToOne(() => Category, (category) => category.skils)
+  // category: Category;
 
   @Column()
   images: string[];
 
-  @OneToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.skills, {
+    nullable: false,
+  })
   owner: User;
 }
