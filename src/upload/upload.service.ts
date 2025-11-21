@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { FILE_TYPES, FILE_TYPES_SET } from './upload.controller';
+import { FILE_TYPES } from './upload.module';
 import { extname } from 'path';
-import { fileTypeFromFile } from 'file-type';
 import { readFile } from 'fs/promises';
 
 @Injectable()
 export class UploadService {
   private types = FILE_TYPES;
-  private typesSet = FILE_TYPES_SET;
 
   private SIGNATURES = {
     PNG: [0x89, 0x50, 0x4e, 0x47],
@@ -47,10 +45,6 @@ export class UploadService {
     file: Express.Multer.File,
   ): Promise<boolean> {
     try {
-      const fileType = await fileTypeFromFile(file.path);
-      if (fileType) {
-        return this.typesSet.has(fileType.mime);
-      }
       const buffer = await readFile(file.path);
       const uintArray = new Uint8Array(buffer);
       for (const sig of Object.keys(this.SIGNATURES)) {
