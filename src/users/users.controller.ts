@@ -12,6 +12,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TAuthResponse } from '../auth/type';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import { UsersService } from './users.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -34,6 +35,13 @@ export class UsersController {
     return this.usersService.getCurrentUser(userId);
   }
 
+  @Patch('me')
+  @UseGuards(JwtAuthGuard)
+  async updateMe(@Request() req: TAuthResponse, @Body() dto: UpdateUserDto) {
+    const userId = req.user.sub;
+    return this.usersService.updateMe(userId, dto);
+  }
+
   @Patch('me/password')
   @UseGuards(JwtAuthGuard)
   async updateUserPassword(
@@ -43,11 +51,6 @@ export class UsersController {
     const userId = req.user.sub;
     await this.usersService.updateUserPassword(userId, updatePassword);
     return { message: 'Пароль успешно изменен' };
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string) {
-    return this.usersService.update(+id);
   }
 
   @Delete(':id')

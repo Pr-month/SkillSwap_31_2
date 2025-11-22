@@ -10,6 +10,7 @@ import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -76,8 +77,12 @@ export class UsersService {
     );
   }
 
-  update(id: number) {
-    return `This action updates a #${id} user `;
+  async updateMe(userId: number, dto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(userId);
+
+    Object.assign(user, dto);
+
+    return await this.userRepository.save(user);
   }
 
   remove(id: number) {
