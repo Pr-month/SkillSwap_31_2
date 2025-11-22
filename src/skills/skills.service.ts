@@ -1,3 +1,9 @@
+import { ConflictException, Injectable } from '@nestjs/common';
+import { CreateSkillDto } from './dto/create-skill.dto';
+import { UpdateSkillDto } from './dto/update-skill.dto';
+import { Skill } from './entities/skill.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
@@ -14,8 +20,21 @@ export class SkillsService {
     private skillsRepository: Repository<Skill>,
   ) { }
 
-  create(createSkillDto: CreateSkillDto) {
-    return createSkillDto;
+  async create(userId: number, createSkillDto: CreateSkillDto): Promise<Skill> {
+
+    const existingSkill = await this.skillsRepository.findOne({
+      where: { title: createSkillDto.title }
+    });
+
+    if (existingSkill) {
+      throw new ConflictException('Навык с таким названием уже существует');
+    }
+
+    const skill = this.skillsRepository.create({
+      ...createSkillDto,
+      owner: { id: userId }
+    });
+    return await this.skillsRepository.save(skill);
   }
 
   async findAll(query: FindSkillsQueryDto): Promise<{ skills: Skill[]; total: number; page: number; totalPages: number }> {

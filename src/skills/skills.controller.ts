@@ -4,13 +4,18 @@ import {
   Post,
   Body,
   Patch,
+  Request,
   Param,
   Delete,
+  UseGuards,
   Query,
 } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Skill } from './entities/skill.entity';
+import { TAuthResponse } from '../auth/type';
 import { FindSkillsQueryDto } from './dto/find-skill.dto';
 
 @Controller('skills')
@@ -18,8 +23,10 @@ export class SkillsController {
   constructor(private readonly skillsService: SkillsService) { }
 
   @Post()
-  create(@Body() createSkillDto: CreateSkillDto) {
-    return this.skillsService.create(createSkillDto);
+  @UseGuards(JwtAuthGuard)
+  async create(@Request() req: TAuthResponse, @Body() createSkillDto: CreateSkillDto): Promise<Skill> {
+    const userId = req.user.sub;
+    return await this.skillsService.create(userId, createSkillDto);
   }
 
   @Get()
