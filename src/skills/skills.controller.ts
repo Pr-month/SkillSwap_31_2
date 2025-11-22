@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
@@ -15,6 +16,7 @@ import { UpdateSkillDto } from './dto/update-skill.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Skill } from './entities/skill.entity';
 import { TAuthResponse } from '../auth/type';
+import { FindSkillsQueryDto } from './dto/find-skill.dto';
 
 @Controller('skills')
 export class SkillsController {
@@ -28,8 +30,8 @@ export class SkillsController {
   }
 
   @Get()
-  findAll() {
-    return this.skillsService.findAll();
+  async findAll(@Query() query: FindSkillsQueryDto) {
+    return await this.skillsService.findAll(query);
   }
 
   @Get(':id')
