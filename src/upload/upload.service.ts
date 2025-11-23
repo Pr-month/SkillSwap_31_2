@@ -1,6 +1,5 @@
-import { HttpException, Injectable, UploadedFile } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { FILE_TYPES } from './upload.module';
-import { extname } from 'path';
 import { readFile } from 'fs/promises';
 
 @Injectable()
@@ -8,64 +7,64 @@ export class UploadService {
   private types = FILE_TYPES;
 
   private SIGNATURES = {
-    PNG: [0x89, 0x50, 0x4e, 0x47],
     JPEG: [0xff, 0xd8, 0xff],
-    GIF: [0x47, 0x49, 0x46],
-    SVG: [0x3c, 0x3f, 0x78, 0x6d, 0x6c], // <?xml
-    SVG_ALT: [0x3c, 0x73, 0x76, 0x67], // <svg
+    PNG: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+    GIF: [0x47, 0x49, 0x46, 0x38], // 'GIF8'
+    WEBP: [0x52, 0x49, 0x46, 0x46], // 'RIFF'
   };
 
   constructor() {}
 
-  async upload(@UploadedFile() file) {
+  async upload(file: Express.Multer.File) {
     try {
-      if (!this.__isValidFormat(file)) {
-        return Promise.reject(
-          new HttpException('неправильный формат файла', 422),
-        );
+      if (!FILE_TYPES.includes(file.mimetype)) {
+        throw new HttpException('неправильный формат файла', 422);
       }
-      const isValidSignature = await this.__checkImageSignature(file);
+
+      const isValidSignature = await this.checkImageSignature(file);
       if (!isValidSignature) {
-        return Promise.reject(
-          new HttpException('неправильный формат файла', 422),
-        );
+        throw new HttpException('неправильный формат файла', 422);
       }
-      return Promise.resolve({
+
+      return {
         originalName: file.originalname,
         filename: file.filename,
-      });
-    } catch {
-      return Promise.reject(
-        new HttpException('неправильный формат файла', 422),
-      );
+        size: file.size,
+        mimetype: file.mimetype,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException('неправильный формат файла', 422);
     }
   }
 
-  private __isValidFormat(@UploadedFile() file) {
-    return this.types
-      .map((type) => `.${type.split('/')[1]}`)
-      .includes(extname(file.path));
-  }
-
-  private async __checkImageSignature(@UploadedFile() file): Promise<boolean> {
+  private async checkImageSignature(file: Express.Multer.File): Promise<boolean> {
     try {
       const buffer = await readFile(file.path);
       const uintArray = new Uint8Array(buffer);
-      for (const sig of Object.keys(this.SIGNATURES)) {
-        if (this.__checkSignature(uintArray, this.SIGNATURES[sig])) {
-          return Promise.resolve(true);
-        }
+      
+      if (file.mimetype === 'image/jpeg') {
+        return this.checkSignature(uintArray, this.SIGNATURES.JPEG);
+      } else if (file.mimetype === 'image/png') {
+        return this.checkSignature(uintArray, this.SIGNATURES.PNG);
+      } else if (file.mimetype === 'image/gif') {
+        return this.checkSignature(uintArray, this.SIGNATURES.GIF);
+      } else if (file.mimetype === 'image/webp') {
+        return this.checkSignature(uintArray, this.SIGNATURES.WEBP);
+      } else if (file.mimetype === 'image/svg+xml') {
+        const text = buffer.toString('utf-8');
+        return text.includes('<svg') || text.includes('<?xml');
       }
-      return Promise.reject(false);
+      
+      return false;
     } catch {
-      return Promise.reject(false);
+      return false;
     }
   }
 
-  private __checkSignature(
-    uintArray: Uint8Array,
-    signature: number[],
-  ): boolean {
+  private checkSignature(uintArray: Uint8Array, signature: number[]): boolean {
     if (uintArray.length < signature.length) {
       return false;
     }
