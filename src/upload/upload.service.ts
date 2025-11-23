@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable, UploadedFile } from '@nestjs/common';
 import { FILE_TYPES } from './upload.module';
 import { extname } from 'path';
 import { readFile } from 'fs/promises';
@@ -17,33 +17,37 @@ export class UploadService {
 
   constructor() {}
 
-  async upload(file: Express.Multer.File) {
+  async upload(@UploadedFile() file) {
     try {
       if (!this.__isValidFormat(file)) {
-        return Promise.reject();
+        return Promise.reject(
+          new HttpException('неправильный формат файла', 422),
+        );
       }
       const isValidSignature = await this.__checkImageSignature(file);
       if (!isValidSignature) {
-        return Promise.reject();
+        return Promise.reject(
+          new HttpException('неправильный формат файла', 422),
+        );
       }
-      return {
+      return Promise.resolve({
         originalName: file.originalname,
         filename: file.filename,
-      };
+      });
     } catch {
-      return Promise.reject();
+      return Promise.reject(
+        new HttpException('неправильный формат файла', 422),
+      );
     }
   }
 
-  private __isValidFormat(file: Express.Multer.File) {
+  private __isValidFormat(@UploadedFile() file) {
     return this.types
       .map((type) => `.${type.split('/')[1]}`)
       .includes(extname(file.path));
   }
 
-  private async __checkImageSignature(
-    file: Express.Multer.File,
-  ): Promise<boolean> {
+  private async __checkImageSignature(@UploadedFile() file): Promise<boolean> {
     try {
       const buffer = await readFile(file.path);
       const uintArray = new Uint8Array(buffer);

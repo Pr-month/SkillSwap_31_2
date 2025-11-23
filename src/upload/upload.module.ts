@@ -21,10 +21,10 @@ export const FILE_TYPES_SET = new Set(FILE_TYPES);
   imports: [
     MulterModule.register({
       storage: diskStorage({
-        destination: join(__dirname, '../public/uploads'),
+        destination: join(__dirname, '../../public/uploads'),
         filename: (_, file, cb) => {
-          const uniq = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-          cb(null, `${uniq}.${extname(file.originalname)}`);
+          const uniq = `${Date.now()}-${Math.random() * 10}`;
+          cb(null, `${uniq}${extname(file.originalname)}`);
         },
       }),
       fileFilter: (_, file, cb) => {

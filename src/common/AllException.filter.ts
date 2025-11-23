@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { EntityNotFoundError } from 'typeorm';
 import { Response } from 'express';
+import { PayloadTooLargeException } from '@nestjs/common';
+import { QueryFailedError } from 'typeorm';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
@@ -37,6 +39,29 @@ export class AllExceptionFilter implements ExceptionFilter {
         path,
         timestamp,
       });
+    } else if (exception instanceof PayloadTooLargeException) {
+      response.status(413).json({
+        statusCode: 413,
+        message: 'файл невалиден по причине размера',
+        error: 'Payload Too Large',
+        path,
+        timestamp,
+      });
+    } else if (exception instanceof QueryFailedError) {
+      const error = exception.driverError;
+      if (
+        error.code === '23505' ||
+        error.code === 'ER_DUP_ENTRY' ||
+        error.code === 'SQLITE_CONSTRAINT_UNIQUE'
+      ) {
+        response.status(409).json({
+          statusCode: 409,
+          message: 'ресурс уже существует',
+          error: 'Conflict',
+          path,
+          timestamp,
+        });
+      }
     }
 
     return response.status(status).json({
