@@ -1,6 +1,12 @@
 import * as bcrypt from 'bcryptjs';
-import { BeforeInsert, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UserGender, Role } from '../users.enums';
+import { Skill } from 'src/skills/entities/skill.entity';
 
 export class User {
   @PrimaryGeneratedColumn()
@@ -46,8 +52,8 @@ export class User {
   @Column()
   avatar: string;
 
-  /*@OneToMany(() => Skill, skill => skill.user)
-  skills: */
+  @OneToMany(() => Skill, (skill) => skill.owner)
+  skills?: Skill[];
 
   /*@ManyToMany(() => Skill, skill => skill.users)
   wantToLearn: */
