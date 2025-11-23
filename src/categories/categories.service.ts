@@ -19,7 +19,7 @@ export class CategoriesService {
   update(id: number, updateCategoryDto: UpdateCategoryDto) {
     return {
       id,
-      updateCategoryDto
+      updateCategoryDto,
     };
   }
 
