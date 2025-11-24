@@ -10,16 +10,17 @@ import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(user: CreateUserDto) {
-    const createdUser = await this.userRepository.create(user);
+    const createdUser = this.userRepository.create(user);
     return await this.userRepository.save(createdUser);
   }
 
@@ -49,7 +50,10 @@ export class UsersService {
     userId: number,
     updatePassword: UpdatePasswordDto,
   ): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { id: userId }, select: ['id', 'password'] }) as Pick<User, 'id' | 'password'> | null;
+    const user = (await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'password'],
+    })) as Pick<User, 'id' | 'password'> | null;
     if (!user) {
       throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
     }
@@ -69,12 +73,16 @@ export class UsersService {
 
     await this.userRepository.update(
       { id: userId },
-      { password: hashedNewPassword }
+      { password: hashedNewPassword },
     );
   }
 
-  update(id: number) {
-    return `This action updates a #${id} user `;
+  async updateMe(userId: number, dto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(userId);
+
+    Object.assign(user, dto);
+
+    return await this.userRepository.save(user);
   }
 
   remove(id: number) {

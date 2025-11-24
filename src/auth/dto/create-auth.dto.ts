@@ -1,15 +1,12 @@
 import {
+  IsDateString,
+  IsEmail,
+  IsEnum,
+  IsFQDN,
   IsNotEmpty,
   IsString,
-  MinLength,
   MaxLength,
-  IsEmail,
-  IsDateString,
-  IsEnum,
-  IsArray,
-  IsFQDN,
-  ArrayUnique,
-  ArrayMaxSize,
+  MinLength,
 } from 'class-validator';
 import { UserGender } from 'src/users/users.enums';
 

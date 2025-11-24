@@ -2,9 +2,11 @@ import * as bcrypt from 'bcryptjs';
 import {
   BeforeInsert,
   Column,
-  PrimaryGeneratedColumn
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserGender, Role } from '../users.enums';
+import { Skill } from 'src/skills/entities/skill.entity';
 
 export class User {
   @PrimaryGeneratedColumn()
@@ -25,7 +27,10 @@ export class User {
 
   @BeforeInsert()
   async beforeInsert() {
-    this.password = await bcrypt.hash(this.password, process.env.HASH_SALT || 10);
+    this.password = await bcrypt.hash(
+      this.password,
+      process.env.HASH_SALT || 10,
+    );
   }
 
   @Column()
@@ -47,8 +52,8 @@ export class User {
   @Column()
   avatar: string;
 
-  /*@OneToMany(() => Skill, skill => skill.user)
-  skills: */
+  @OneToMany(() => Skill, (skill) => skill.owner)
+  skills?: Skill[];
 
   /*@ManyToMany(() => Skill, skill => skill.users)
   wantToLearn: */

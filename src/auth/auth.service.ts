@@ -1,12 +1,10 @@
-import {
-  Inject,
-  Injectable
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { configuration, IConfig } from 'src/config/app.config';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
+import { IJwtConfig, jwtConfig } from 'src/config/jwt.config';
 
 @Injectable()
 export class AuthService {
@@ -14,18 +12,36 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     @Inject(configuration.KEY)
-    private readonly appConfig: IConfig
-  ) { }
+    private readonly appConfig: IConfig,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfig: IJwtConfig,
+  ) {}
 
-  async auth(user: User) {
+  async auth(user: User): Promise<{
+    access_token: string;
+    refresh_token: string;
+  }> {
     const payload = { sub: user.id };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign(payload, {
+      secret: this.jwtConfig.secretToken,
+      expiresIn: this.jwtConfig.secretExpiresIn,
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.jwtConfig.refreshToken,
+      expiresIn: this.jwtConfig.refreshExpiresIn,
+    });
 
-    return {
+    return Promise.resolve({
       access_token: accessToken,
       refresh_token: refreshToken,
-    };
+    });
+  }
+
+  generateTokens(user: User): Promise<{
+    access_token: string;
+    refresh_token: string;
+  }> {
+    return this.auth(user);
   }
 
   async validatePassword(email: string, password: string) {
