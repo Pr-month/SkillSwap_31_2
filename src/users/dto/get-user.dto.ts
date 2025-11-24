@@ -1,4 +1,4 @@
-import { SkillResponseDto } from "../../skills/dto/get-skill.dto";
+import { SkillResponseDto } from '../../skills/dto/get-skill.dto';
 
 export class UserResponseDto {
   id: string;
