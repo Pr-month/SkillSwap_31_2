@@ -10,6 +10,7 @@ import { DatabaseModule } from './database/database.module';
 import { dbConfiguration } from './config/db.config';
 import { IJwtConfig, jwtConfig } from './config/jwt.config';
 import { SkillsModule } from './skills/skills.module';
+import { UploadModule } from './upload/upload.module';
 import { CategoriesModule } from './categories/categories.module';
 
 @Module({
@@ -30,6 +31,7 @@ import { CategoriesModule } from './categories/categories.module';
     AuthModule,
     UsersModule,
     SkillsModule,
+    UploadModule,
     CategoriesModule,
   ],
   controllers: [AppController],

@@ -52,7 +52,9 @@ export class SkillsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.skillsService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  remove(@Param('id') id: string, @Request() req: TAuthResponse) {
+    const userId = req.user.sub;
+    return this.skillsService.remove(+id, userId);
   }
 }
