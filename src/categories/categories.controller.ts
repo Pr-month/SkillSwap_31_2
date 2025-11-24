@@ -1,17 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards } from '@nestjs/common';
-import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { TAuthResponse } from '../auth/type';
-import { Category } from './entities/category.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../users/users.enums';
 import { JwtRolesGuard } from '../auth/guards/jwt-roles.guard';
+import { Role } from '../users/users.enums';
+import { CategoriesService } from './categories.service';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('categories')
 @UseGuards(JwtRolesGuard)
