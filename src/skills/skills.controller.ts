@@ -20,7 +20,7 @@ import { FindSkillsQueryDto } from './dto/find-skill.dto';
 
 @Controller('skills')
 export class SkillsController {
-  constructor(private readonly skillsService: SkillsService) {}
+  constructor(private readonly skillsService: SkillsService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -30,6 +30,16 @@ export class SkillsController {
   ): Promise<Skill> {
     const userId = req.user.sub;
     return await this.skillsService.create(userId, createSkillDto);
+  }
+
+  @Post(':id/favorite')
+  @UseGuards(JwtAuthGuard)
+  async addToFavorites(
+    @Request() req: TAuthResponse,
+    @Param('id') id: string,
+  ): Promise<Skill> {
+    const userId = req.user.sub;
+    return await this.skillsService.addToFavorites(+id, userId);
   }
 
   @Get()

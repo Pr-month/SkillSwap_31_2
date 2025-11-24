@@ -10,13 +10,16 @@ import { Like, Repository } from 'typeorm';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class SkillsService {
   constructor(
     @InjectRepository(Skill)
     private skillsRepository: Repository<Skill>,
-  ) {}
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) { }
 
   async create(userId: number, createSkillDto: CreateSkillDto): Promise<Skill> {
     const existingSkill = await this.skillsRepository.findOne({
@@ -32,6 +35,43 @@ export class SkillsService {
       owner: { id: userId },
     });
     return await this.skillsRepository.save(skill);
+  }
+
+  async addToFavorites(skillId: number, userId: number,): Promise<Skill> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['favoriteSkills'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Навык не найден');
+    }
+
+    const isAlreadyFavorite = user.favoriteSkills?.some(
+      (favSkill) => favSkill.id === skillId,
+    );
+
+    if (isAlreadyFavorite) {
+      throw new NotFoundException('Навык уже в избранном');
+    }
+
+    if (!user.favoriteSkills) {
+      user.favoriteSkills = [];
+    }
+
+    user.favoriteSkills.push(skill);
+
+    await this.usersRepository.save(user);
+
+    return skill;
   }
 
   async findAll(query: FindSkillsQueryDto): Promise<{
