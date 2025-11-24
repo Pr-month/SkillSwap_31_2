@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
@@ -21,9 +25,22 @@ export class CategoriesService {
       throw new ConflictException('Категория с таким названием уже существует');
     }
 
-    const category = this.categoriesRepository.create({
-      ...createCategoryDto,
-    });
+    const category = new Category();
+
+    category.name = createCategoryDto.name;
+
+    if (createCategoryDto.parentId) {
+      const parentCategory = await this.categoriesRepository.findOne({
+        where: { id: createCategoryDto.parentId },
+      });
+
+      if (!parentCategory) {
+        throw new NotFoundException('Родительская категория не найдена');
+      }
+
+      category.parent = parentCategory;
+    }
+
     return await this.categoriesRepository.save(category);
   }
 
