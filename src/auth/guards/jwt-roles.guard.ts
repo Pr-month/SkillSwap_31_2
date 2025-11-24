@@ -5,29 +5,28 @@ import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()
 export class JwtRolesGuard extends AuthGuard('jwt') {
-    constructor(private reflector: Reflector) {
-        super();
+  constructor(private reflector: Reflector) {
+    super();
+  }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const canActivate = await super.canActivate(context);
+    if (!canActivate) {
+      return false;
     }
 
-    async canActivate(context: ExecutionContext): Promise<boolean> {
+    const requiredRoles = this.reflector.get<string[]>(
+      ROLES_KEY,
+      context.getHandler(),
+    );
 
-        const canActivate = await super.canActivate(context);
-        if (!canActivate) {
-            return false;
-        }
-
-        const requiredRoles = this.reflector.get<string[]>(
-            ROLES_KEY,
-            context.getHandler()
-        );
-
-        if (!requiredRoles) {
-            return true;
-        }
-        
-        const request = context.switchToHttp().getRequest();
-        const user = request.user;
-
-        return requiredRoles.some(role => user.roles.includes(role));
+    if (!requiredRoles) {
+      return true;
     }
+
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    return requiredRoles.some((role) => user.roles.includes(role));
+  }
 }

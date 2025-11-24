@@ -40,11 +40,13 @@ export class UploadService {
     }
   }
 
-  private async checkImageSignature(file: Express.Multer.File): Promise<boolean> {
+  private async checkImageSignature(
+    file: Express.Multer.File,
+  ): Promise<boolean> {
     try {
       const buffer = await readFile(file.path);
       const uintArray = new Uint8Array(buffer);
-      
+
       if (file.mimetype === 'image/jpeg') {
         return this.checkSignature(uintArray, this.SIGNATURES.JPEG);
       } else if (file.mimetype === 'image/png') {
@@ -57,7 +59,7 @@ export class UploadService {
         const text = buffer.toString('utf-8');
         return text.includes('<svg') || text.includes('<?xml');
       }
-      
+
       return false;
     } catch {
       return false;

@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
@@ -10,10 +14,9 @@ export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
-  ) { }
+  ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
-
     const existingCategory = await this.categoriesRepository.findOne({
       where: { name: createCategoryDto.name },
     });
@@ -28,7 +31,7 @@ export class CategoriesService {
 
     if (createCategoryDto.parentId) {
       const parentCategory = await this.categoriesRepository.findOne({
-        where: { id: createCategoryDto.parentId }
+        where: { id: createCategoryDto.parentId },
       });
 
       if (!parentCategory) {
