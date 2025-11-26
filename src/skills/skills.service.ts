@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { FindSkillsQueryDto } from './dto/find-skill.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { FindOptionsWhere, Like, Repository } from 'typeorm';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
@@ -43,10 +43,10 @@ export class SkillsService {
     const { page, limit, search } = query;
     const offset = (page - 1) * limit;
 
-    const whereConditions: any = {};
+    const whereConditions: FindOptionsWhere<Skill> = {};
 
     if (search) {
-      whereConditions.name = Like(`%${search}%`);
+      whereConditions.title = Like(`%${search}%`);
     }
 
     const total = await this.skillsRepository.count({ where: whereConditions });
