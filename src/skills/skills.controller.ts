@@ -58,7 +58,7 @@ export class SkillsController {
     return this.skillsService.remove(+id, userId);
   }
 
-  @Delete('favorite/:id')
+  @Delete('favorites/:id')
   @UseGuards(JwtAuthGuard)
   async removeToFavorites(
     @Request() req: TAuthResponse,
