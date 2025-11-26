@@ -32,7 +32,7 @@ export class SkillsController {
     return await this.skillsService.create(userId, createSkillDto);
   }
 
-  @Post(':id/favorite')
+  @Post('favorites/:id')
   @UseGuards(JwtAuthGuard)
   async addToFavorites(
     @Request() req: TAuthResponse,
