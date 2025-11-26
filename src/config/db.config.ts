@@ -1,5 +1,6 @@
 import { ConfigType, registerAs } from '@nestjs/config';
-import { DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
+
 export const dbConfiguration = registerAs(
   'DB_CONFIG',
   (): DataSourceOptions => ({
@@ -15,3 +16,5 @@ export const dbConfiguration = registerAs(
 );
 
 export type IDbConfig = ConfigType<typeof dbConfiguration>;
+
+export const AppDataSource = new DataSource(dbConfiguration());
