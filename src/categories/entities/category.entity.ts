@@ -1,9 +1,9 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  Entity,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity()
@@ -17,7 +17,7 @@ export class Category {
   @ManyToOne(() => Category, (category) => category.children, {
     nullable: true,
   })
-  parent: Category;
+  parent?: Category | null;
 
   @OneToMany(() => Category, (category) => category.parent)
   children: Category[];
