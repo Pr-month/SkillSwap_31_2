@@ -2,6 +2,7 @@ import * as bcrypt from 'bcryptjs';
 import {
   BeforeInsert,
   Column,
+  Entity,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
