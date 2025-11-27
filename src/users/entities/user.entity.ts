@@ -2,6 +2,7 @@ import * as bcrypt from 'bcryptjs';
 import {
   BeforeInsert,
   Column,
+  Entity,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -9,6 +10,7 @@ import {
 import { UserGender, Role } from '../users.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
 
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
