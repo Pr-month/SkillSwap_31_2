@@ -2,6 +2,7 @@ import * as bcrypt from 'bcryptjs';
 import {
   BeforeInsert,
   Column,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -58,8 +59,8 @@ export class User {
   /*@ManyToMany(() => Skill, skill => skill.users)
   wantToLearn: */
 
-  /*@ManyToMany(() => Skill, skill => skill.users)
-  favoriteSkills : */
+  @ManyToMany(() => Skill, skill => skill.favoritedBy)
+  favoriteSkills: Skill[];
 
   @Column({
     default: Role.User,
