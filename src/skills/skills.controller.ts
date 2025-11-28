@@ -32,6 +32,16 @@ export class SkillsController {
     return await this.skillsService.create(userId, createSkillDto);
   }
 
+  @Post('favorites/:id')
+  @UseGuards(JwtAuthGuard)
+  async addToFavorites(
+    @Request() req: TAuthResponse,
+    @Param('id') id: string,
+  ): Promise<Skill> {
+    const userId = req.user.sub;
+    return await this.skillsService.addToFavorites(+id, userId);
+  }
+
   @Get()
   async findAll(@Query() query: FindSkillsQueryDto) {
     return await this.skillsService.findAll(query);
