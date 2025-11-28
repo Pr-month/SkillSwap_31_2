@@ -38,16 +38,12 @@ export class SkillsService {
   }
 
   async addToFavorites(skillId: number, userId: number,): Promise<Skill> {
-    const user = await this.usersRepository.findOne({
+    const user = await this.usersRepository.findOneOrFail({
       where: { id: userId },
       relations: ['favoriteSkills'],
     });
 
-    if (!user) {
-      throw new NotFoundException('Пользователь не найден');
-    }
-
-    const skill = await this.skillsRepository.findOne({
+    const skill = await this.skillsRepository.findOneOrFail({
       where: { id: skillId },
     });
 
@@ -60,7 +56,7 @@ export class SkillsService {
     );
 
     if (isAlreadyFavorite) {
-      throw new NotFoundException('Навык уже в избранном');
+      throw new ConflictException('Навык уже в избранном');
     }
 
     if (!user.favoriteSkills) {
