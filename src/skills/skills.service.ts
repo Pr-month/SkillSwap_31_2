@@ -17,7 +17,7 @@ export class SkillsService {
   constructor(
     @InjectRepository(Skill)
     private skillsRepository: Repository<Skill>,
-    @InjectRepository(Skill)
+    @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) { }
 
@@ -35,6 +35,39 @@ export class SkillsService {
       owner: { id: userId },
     });
     return await this.skillsRepository.save(skill);
+  }
+
+  async addToFavorites(skillId: number, userId: number,): Promise<Skill> {
+    const user = await this.usersRepository.findOneOrFail({
+      where: { id: userId },
+      relations: ['favoriteSkills'],
+    });
+
+    const skill = await this.skillsRepository.findOneOrFail({
+      where: { id: skillId },
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Навык не найден');
+    }
+
+    const isAlreadyFavorite = user.favoriteSkills?.some(
+      (favSkill) => favSkill.id === skillId,
+    );
+
+    if (isAlreadyFavorite) {
+      throw new ConflictException('Навык уже в избранном');
+    }
+
+    if (!user.favoriteSkills) {
+      user.favoriteSkills = [];
+    }
+
+    user.favoriteSkills.push(skill);
+
+    await this.usersRepository.save(user);
+
+    return skill;
   }
 
   async findAll(query: FindSkillsQueryDto): Promise<{
