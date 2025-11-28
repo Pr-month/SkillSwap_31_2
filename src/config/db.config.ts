@@ -1,6 +1,5 @@
 import { ConfigType, registerAs } from '@nestjs/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
-
 export const dbConfiguration = registerAs(
   'DB_CONFIG',
   (): DataSourceOptions => ({
@@ -10,7 +9,7 @@ export const dbConfiguration = registerAs(
     username: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_NAME || 'app_db',
-    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     synchronize: process.env.NODE_ENV !== 'production',
   }),
 );
