@@ -67,4 +67,15 @@ export class SkillsController {
     const userId = req.user.sub;
     return this.skillsService.remove(+id, userId);
   }
+
+  @Delete('favorites/:id')
+  @UseGuards(JwtAuthGuard)
+  async removeToFavorites(
+    @Request() req: TAuthResponse,
+    @Param('id') id: string,
+  ): Promise<Skill> {
+    const userId = req.user.sub;
+    return await this.skillsService.removeToFavorites(+id, userId);
+  }
 }
+

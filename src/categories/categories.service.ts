@@ -7,7 +7,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 
 @Injectable()
 export class CategoriesService {
@@ -44,22 +44,85 @@ export class CategoriesService {
     return await this.categoriesRepository.save(category);
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  async findAll() {
+    return await this.categoriesRepository.find({
+      where: {
+        parent: IsNull(),
+      },
+      relations: ['children'],
+    });
   }
 
-  findOne(id: number) {
-    return id;
+  async findOne(id: number) {
+    return await this.categoriesRepository.findOneOrFail({
+      where: { id },
+      relations: ['parent', 'children'],
+    });
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return {
-      id,
-      updateCategoryDto,
-    };
+  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+    const category = await this.categoriesRepository.findOne({
+      where: { id },
+      relations: ['parent'],
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Категория с ID ${id} не найдена`);
+    }
+
+    if (updateCategoryDto.name) {
+      const existing = await this.categoriesRepository.findOne({
+        where: { name: updateCategoryDto.name },
+      });
+
+      if (existing && existing.id !== id) {
+        throw new ConflictException(
+          'Категория с таким названием уже существует',
+        );
+      }
+
+      category.name = updateCategoryDto.name;
+    }
+
+    if (updateCategoryDto.parentId !== undefined) {
+      if (updateCategoryDto.parentId === null) {
+        category.parent = null;
+      } else {
+        const parent = await this.categoriesRepository.findOne({
+          where: { id: updateCategoryDto.parentId },
+        });
+
+        if (!parent) {
+          throw new NotFoundException('Родительская категория не найдена');
+        }
+
+        if (parent.id === id) {
+          throw new ConflictException(
+            'Категория не может быть родителем самой себе',
+          );
+        }
+
+        category.parent = parent;
+      }
+    }
+
+    await this.categoriesRepository.save(category);
+
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return id;
+  async remove(id: number) {
+    const category = await this.categoriesRepository.findOne({
+      where: { id },
+      relations: ['children'],
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Категория с ID ${id} не найдена`);
+    }
+
+    await this.categoriesRepository.remove(category);
+
+    return { message: 'Категория успешно удалена' };
   }
 }

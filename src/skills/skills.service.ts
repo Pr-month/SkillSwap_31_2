@@ -151,4 +151,39 @@ export class SkillsService {
 
     return await this.skillsRepository.remove(skill);
   }
+
+  async removeToFavorites(skillId: number, userId: number): Promise<Skill> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['favoriteSkills'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Навык не найден');
+    }
+
+    const skillInFavorites = user.favoriteSkills.some(
+      (favSkill) => favSkill.id === skillId,
+    );
+
+    if (!skillInFavorites) {
+      throw new NotFoundException('Навыка нет в избранном');
+    }
+
+    user.favoriteSkills = user.favoriteSkills.filter(
+      (favSkill) => favSkill.id !== skillId,
+    );
+
+    await this.usersRepository.save(user);
+
+    return skill;
+  }
 }
