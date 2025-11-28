@@ -2,6 +2,7 @@ import { Injectable, ExecutionContext } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
+import { TAuthResponse } from '../type';
 
 @Injectable()
 export class JwtRolesGuard extends AuthGuard('jwt') {
@@ -24,9 +25,9 @@ export class JwtRolesGuard extends AuthGuard('jwt') {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<TAuthResponse>();
     const user = request.user;
 
-    return requiredRoles.some((role) => user.roles.includes(role));
+    return requiredRoles.includes(user.role);
   }
 }
