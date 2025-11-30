@@ -5,12 +5,13 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { RequestStatus } from '../requests.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
 
 @Entity('request')
-export class RequestEntity {
+export class Request {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,8 +27,12 @@ export class RequestEntity {
   @Column({
     type: 'enum',
     enum: RequestStatus,
+    default: RequestStatus.pending,
   })
   status: RequestStatus;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @ManyToOne(() => Skill, { nullable: false, onDelete: 'CASCADE' })
   offeredSkill: Skill;
