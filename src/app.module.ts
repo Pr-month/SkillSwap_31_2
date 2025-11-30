@@ -11,7 +11,6 @@ import { dbConfiguration } from './config/db.config';
 import { IJwtConfig, jwtConfig } from './config/jwt.config';
 import { SkillsModule } from './skills/skills.module';
 import { UploadModule } from './upload/upload.module';
-import { CategoriesModule } from './categories/categories.module';
 import { RequestsModule } from './requests/requests.module';
 
 @Module({
@@ -33,10 +32,8 @@ import { RequestsModule } from './requests/requests.module';
     UsersModule,
     SkillsModule,
     UploadModule,
-    CategoriesModule,
-    RequestsModule,
+    RequestsModule
   ],
-  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
