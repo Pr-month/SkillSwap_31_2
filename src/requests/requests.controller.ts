@@ -21,7 +21,7 @@ import { TAuthResponse } from '../auth/type';
 
 @Controller('requests')
 export class RequestsController {
-  constructor(private readonly requestsService: RequestsService) { }
+  constructor(private readonly requestsService: RequestsService) {}
 
   @Post()
   create(@Body() createRequestDto: CreateRequestDto) {
@@ -43,7 +43,7 @@ export class RequestsController {
   update(
     @Param('id') id: string,
     @Body() updateRequestDto: UpdateRequestDto,
-    @Request() req: TAuthResponse
+    @Request() req: TAuthResponse,
   ): Promise<RequestEntity> {
     const userId = req.user.sub;
     const userRole = req.user.role;
@@ -55,7 +55,7 @@ export class RequestsController {
   @UseGuards(JwtRolesGuard, JwtAuthGuard)
   remove(
     @Param('id') id: string,
-    @Request() req: TAuthResponse
+    @Request() req: TAuthResponse,
   ): Promise<RequestEntity> {
     const userId = req.user.sub;
     const userRole = req.user.role;

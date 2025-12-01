@@ -61,7 +61,7 @@ export class User {
   /*@ManyToMany(() => Skill, skill => skill.users)
   wantToLearn: */
 
-  @ManyToMany(() => Skill, skill => skill.favoritedBy)
+  @ManyToMany(() => Skill, (skill) => skill.favoritedBy)
   favoriteSkills: Skill[];
 
   @Column({

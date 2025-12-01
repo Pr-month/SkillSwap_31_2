@@ -20,7 +20,7 @@ import { FindSkillsQueryDto } from './dto/find-skill.dto';
 
 @Controller('skills')
 export class SkillsController {
-  constructor(private readonly skillsService: SkillsService) { }
+  constructor(private readonly skillsService: SkillsService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -78,4 +78,3 @@ export class SkillsController {
     return await this.skillsService.removeToFavorites(+id, userId);
   }
 }
-

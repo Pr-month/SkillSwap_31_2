@@ -19,7 +19,7 @@ export class SkillsService {
     private skillsRepository: Repository<Skill>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(userId: number, createSkillDto: CreateSkillDto): Promise<Skill> {
     const existingSkill = await this.skillsRepository.findOne({
@@ -37,7 +37,7 @@ export class SkillsService {
     return await this.skillsRepository.save(skill);
   }
 
-  async addToFavorites(skillId: number, userId: number,): Promise<Skill> {
+  async addToFavorites(skillId: number, userId: number): Promise<Skill> {
     const user = await this.usersRepository.findOneOrFail({
       where: { id: userId },
       relations: ['favoriteSkills'],

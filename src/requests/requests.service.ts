@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,7 +16,7 @@ export class RequestsService {
   constructor(
     @InjectRepository(RequestEntity)
     private requestRepository: Repository<RequestEntity>,
-  ) { }
+  ) {}
 
   create(createRequestDto: CreateRequestDto) {
     return createRequestDto;
@@ -30,19 +34,21 @@ export class RequestsService {
     id: number,
     updateRequestDto: UpdateRequestDto,
     userId: number,
-    userRole: Role
+    userRole: Role,
   ): Promise<RequestEntity> {
     try {
       const request = await this.requestRepository.findOneOrFail({
         where: { id },
-        relations: ['sender']
+        relations: ['sender'],
       });
 
       checkRequestPermissions(request, userId, userRole, 'update');
 
-      const updatedRequest = this.requestRepository.merge(request, updateRequestDto);
+      const updatedRequest = this.requestRepository.merge(
+        request,
+        updateRequestDto,
+      );
       return await this.requestRepository.save(updatedRequest);
-
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException(`Заявка с id ${id} не найдена`);
@@ -54,17 +60,17 @@ export class RequestsService {
   async remove(
     id: number,
     userId: number,
-    userRole: Role): Promise<RequestEntity> {
+    userRole: Role,
+  ): Promise<RequestEntity> {
     try {
       const request = await this.requestRepository.findOneOrFail({
         where: { id },
-        relations: ['sender']
+        relations: ['sender'],
       });
 
       checkRequestPermissions(request, userId, userRole, 'delete');
 
       return await this.requestRepository.remove(request);
-
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException(`Заявка с id ${id} не найдена`);
