@@ -13,20 +13,21 @@ export class RequestsService {
   constructor(
     @InjectRepository(Request)
     private requestRepository: Repository<RequestEntity>,
-  ) { }
+  ) {}
 
-  async create(createRequestDto: CreateRequestDto) {
-    const request = await this.requestRepository.create(createRequestDto);
-    return await this.requestRepository.save(request);
+  async create(createRequestDto: CreateRequestDto): Promise<RequestEntity> {
+    const request = this.requestRepository.create(createRequestDto);
+    await this.requestRepository.save(request);
+    return request;
   }
 
   async findIncomming(userId: number): Promise<RequestEntity[]> {
     const requests = await this.requestRepository.find({
       where: {
         receiver: {
-          id: userId
-        }
-      }
+          id: userId,
+        },
+      },
     });
     return requests;
   }
@@ -35,10 +36,10 @@ export class RequestsService {
     const requests = await this.requestRepository.find({
       where: {
         receiver: {
-          id: userId
+          id: userId,
         },
-        status: RequestStatus.pending
-      }
+        status: RequestStatus.pending,
+      },
     });
     return requests;
   }
@@ -47,9 +48,9 @@ export class RequestsService {
     const requests = await this.requestRepository.find({
       where: {
         sender: {
-          id: userId
-        }
-      }
+          id: userId,
+        },
+      },
     });
     return requests;
   }
@@ -58,10 +59,10 @@ export class RequestsService {
     const requests = await this.requestRepository.find({
       where: {
         sender: {
-          id: userId
+          id: userId,
         },
-        status: RequestStatus.pending
-      }
+        status: RequestStatus.pending,
+      },
     });
     return requests;
   }
@@ -78,19 +79,21 @@ export class RequestsService {
     id: number,
     updateRequestDto: UpdateRequestDto,
     userId: number,
-    userRole: Role
+    userRole: Role,
   ): Promise<RequestEntity> {
     try {
       const request = await this.requestRepository.findOneOrFail({
         where: { id },
-        relations: ['sender']
+        relations: ['sender'],
       });
 
       checkRequestPermissions(request, userId, userRole, 'update');
 
-      const updatedRequest = this.requestRepository.merge(request, updateRequestDto);
+      const updatedRequest = this.requestRepository.merge(
+        request,
+        updateRequestDto,
+      );
       return await this.requestRepository.save(updatedRequest);
-
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException(`Заявка с id ${id} не найдена`);
@@ -102,17 +105,17 @@ export class RequestsService {
   async remove(
     id: number,
     userId: number,
-    userRole: Role): Promise<RequestEntity> {
+    userRole: Role,
+  ): Promise<RequestEntity> {
     try {
       const request = await this.requestRepository.findOneOrFail({
         where: { id },
-        relations: ['sender']
+        relations: ['sender'],
       });
 
       checkRequestPermissions(request, userId, userRole, 'delete');
 
       return await this.requestRepository.remove(request);
-
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException(`Заявка с id ${id} не найдена`);

@@ -19,32 +19,32 @@ import { TAuthResponse } from '../auth/type';
 
 @Controller('requests')
 export class RequestsController {
-  constructor(private readonly requestsService: RequestsService) { }
+  constructor(private readonly requestsService: RequestsService) {}
 
   @Post()
   async create(@Body() createRequestDto: CreateRequestDto) {
     return await this.requestsService.create(createRequestDto);
   }
 
-  @Get("incomming")
+  @Get('incomming')
   @UseGuards(JwtAuthGuard)
   async getIncommingRequests(@Request() req: TAuthResponse) {
     return await this.requestsService.findIncomming(req.user.sub);
   }
 
-  @Get("incomming/inProgress")
+  @Get('incomming/inProgress')
   @UseGuards(JwtAuthGuard)
   async getIncommingInProgressRequests(@Request() req: TAuthResponse) {
     return await this.requestsService.findIncommingInProgress(req.user.sub);
   }
 
-  @Get("outgoing")
+  @Get('outgoing')
   @UseGuards(JwtAuthGuard)
   async getOutgoingRequests(@Request() req: TAuthResponse) {
     return await this.requestsService.findOutgoing(req.user.sub);
   }
 
-  @Get("outgoing/inProgress")
+  @Get('outgoing/inProgress')
   @UseGuards(JwtAuthGuard)
   async getOutgoingInProgressRequests(@Request() req: TAuthResponse) {
     return await this.requestsService.findOutgoingInProgress(req.user.sub);
@@ -65,7 +65,7 @@ export class RequestsController {
   update(
     @Param('id') id: string,
     @Body() updateRequestDto: UpdateRequestDto,
-    @Request() req: TAuthResponse
+    @Request() req: TAuthResponse,
   ): Promise<RequestEntity> {
     const userId = req.user.sub;
     const userRole = req.user.role;
@@ -77,7 +77,7 @@ export class RequestsController {
   @UseGuards(JwtRolesGuard, JwtAuthGuard)
   remove(
     @Param('id') id: string,
-    @Request() req: TAuthResponse
+    @Request() req: TAuthResponse,
   ): Promise<RequestEntity> {
     const userId = req.user.sub;
     const userRole = req.user.role;

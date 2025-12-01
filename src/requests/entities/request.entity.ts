@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   BeforeInsert,
-  BeforeUpdate
+  BeforeUpdate,
 } from 'typeorm';
 import { RequestStatus } from '../requests.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
@@ -46,14 +46,14 @@ export class Request {
     default: false,
   })
   isread: boolean;
-  
+
   @BeforeUpdate()
-  async update() {
+  update() {
     this.updatedAt = new Date();
   }
 
   @BeforeInsert()
-  async create() {
+  create() {
     this.updatedAt = new Date();
   }
 }

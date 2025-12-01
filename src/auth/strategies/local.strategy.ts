@@ -6,6 +6,7 @@ import { AuthService } from '../auth.service';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
+    /* eslint-disable  @typescript-eslint/no-unsafe-call */
     super();
   }
 
