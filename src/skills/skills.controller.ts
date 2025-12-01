@@ -32,6 +32,16 @@ export class SkillsController {
     return await this.skillsService.create(userId, createSkillDto);
   }
 
+  @Post('favorites/:id')
+  @UseGuards(JwtAuthGuard)
+  async addToFavorites(
+    @Request() req: TAuthResponse,
+    @Param('id') id: string,
+  ): Promise<Skill> {
+    const userId = req.user.sub;
+    return await this.skillsService.addToFavorites(+id, userId);
+  }
+
   @Get()
   async findAll(@Query() query: FindSkillsQueryDto) {
     return await this.skillsService.findAll(query);
@@ -56,5 +66,15 @@ export class SkillsController {
   remove(@Param('id') id: string, @Request() req: TAuthResponse) {
     const userId = req.user.sub;
     return this.skillsService.remove(+id, userId);
+  }
+
+  @Delete('favorites/:id')
+  @UseGuards(JwtAuthGuard)
+  async removeToFavorites(
+    @Request() req: TAuthResponse,
+    @Param('id') id: string,
+  ): Promise<Skill> {
+    const userId = req.user.sub;
+    return await this.skillsService.removeToFavorites(+id, userId);
   }
 }
