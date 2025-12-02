@@ -7,7 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserGender, Role } from '../users.enums';
+import { Role, UserGender } from '../users.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
 
 @Entity('user')
@@ -46,7 +46,7 @@ export class User {
   city: string;
 
   @Column({
-    default: UserGender['not specified'],
+    default: UserGender.notSpecified,
     type: 'enum',
     enum: UserGender,
   })
