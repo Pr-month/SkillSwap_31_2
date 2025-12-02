@@ -1,7 +1,9 @@
 import { ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
+import { TJwtPayload } from 'src/auth/type';
 import { IJwtConfig, jwtConfig } from 'src/config/jwt.config';
+import { ExtendedSocket } from '../types';
 
 @Injectable()
 export class WsJwtGuard {
@@ -12,7 +14,7 @@ export class WsJwtGuard {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const client = context.switchToWs().getClient();
+    const client: ExtendedSocket = context.switchToWs().getClient();
     const token = client.handshake.query.token as string;
 
     if (!token) {
@@ -20,14 +22,15 @@ export class WsJwtGuard {
     }
 
     try {
-      const payload = this.jwtService.verify(token, {
+      const payload = this.jwtService.verify<TJwtPayload>(token, {
         secret: this.jwtConfig.secretToken,
       });
 
-      client.handshake.user = payload;
+      client.data.user = payload;
       return true;
-    } catch (error) {
-      throw new WsException('Invalid token');
+    } catch (error: unknown) {
+      //   throw new WsException('Invalid token');
+      throw new WsException((error as Error).message);
     }
   }
 }
