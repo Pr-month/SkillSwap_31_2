@@ -2,9 +2,9 @@ import {
   IsDateString,
   IsEmail,
   IsEnum,
-  IsFQDN,
   IsNotEmpty,
   IsString,
+  IsUrl,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -48,13 +48,11 @@ export class CreateAuthDto {
   @MaxLength(512)
   city: string;
 
-  @IsEnum(['male', 'female', 'not specified'])
+  @IsEnum(UserGender)
   @IsNotEmpty()
-  @MinLength(1)
-  @MaxLength(16)
   gender: UserGender;
 
-  @IsFQDN()
+  @IsUrl()
   @IsNotEmpty()
   @MinLength(5)
   @MaxLength(1024)
