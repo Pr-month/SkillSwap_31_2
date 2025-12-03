@@ -35,6 +35,11 @@ export class UsersController {
     return this.usersService.getCurrentUser(userId);
   }
 
+  @Get('by-skill/:id')
+  async findUsersBySkill(@Param('id') id: number) {
+    return await this.usersService.findUsersBySkill(id);
+  }
+
   @Patch('me')
   @UseGuards(JwtAuthGuard)
   async updateMe(@Request() req: TAuthResponse, @Body() dto: UpdateUserDto) {

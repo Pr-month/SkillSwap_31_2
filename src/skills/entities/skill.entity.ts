@@ -2,10 +2,13 @@ import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Category } from '../../categories/entities/category.entity';
+import { IsNotEmpty } from 'class-validator';
 
 @Entity('skill')
 export class Skill {
@@ -20,6 +23,14 @@ export class Skill {
 
   // @ManyToOne(() => Category, (category) => category.skils)
   // category: Category;
+
+  @ManyToOne(() => Category, { eager: true, nullable: false })
+  @JoinColumn()
+  @IsNotEmpty()
+  category: Category;
+
+  @ManyToMany(() => User, (user) => user.wantToLearn)
+  wantToLearnBy: User[];
 
   @Column({ type: 'text', array: true })
   images: string[];
