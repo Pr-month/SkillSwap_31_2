@@ -97,18 +97,21 @@ export class UsersService {
   }
 
   async findUsersBySkill(skillId: number): Promise<User[]> {
-    const skill = await this.skillsRepository.findOne({ where: { id: skillId } });
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
     if (!skill) throw new NotFoundException(`Навык с id ${skillId} не найден`);
 
     const categoryId = skill.category.id;
 
-    const users = await this.userRepository.createQueryBuilder('user')
+    const users = await this.userRepository
+      .createQueryBuilder('user')
       .innerJoin('user.wantToLearn', 'skill')
       .where('skill.categoryId = :categoryId', { categoryId })
       .distinct(true) // Убирает дублирование пользователей
       .take(10)
       .getMany();
-      
+
     return users;
   }
 }
