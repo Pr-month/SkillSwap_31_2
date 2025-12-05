@@ -1,4 +1,5 @@
 import { SkillResponseDto } from '../../skills/dto/get-skill.dto';
+import { UserGender } from '../users.enums';
 
 export class UserResponseDto {
   id: string;
@@ -7,7 +8,7 @@ export class UserResponseDto {
   about: string;
   birthdate: Date;
   city: string;
-  gender: string;
+  gender: UserGender;
   avatar: string;
   skills: SkillResponseDto[];
   wantToLearn: string[];

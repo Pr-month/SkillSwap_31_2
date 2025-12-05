@@ -1,8 +1,9 @@
-import { Injectable, ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { TAuthResponse } from '../type';
+import { Role } from 'src/users/users.enums';
 
 @Injectable()
 export class JwtRolesGuard extends AuthGuard('jwt') {
@@ -16,7 +17,7 @@ export class JwtRolesGuard extends AuthGuard('jwt') {
       return false;
     }
 
-    const requiredRoles = this.reflector.get<string[]>(
+    const requiredRoles = this.reflector.get<Role[]>(
       ROLES_KEY,
       context.getHandler(),
     );
