@@ -12,20 +12,42 @@ import {
 import { RequestsService } from './requests.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../users/users.enums';
 import { JwtRolesGuard } from '../auth/guards/jwt-roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RequestEntity } from './entities/request.entity';
 import { TAuthResponse } from '../auth/type';
+import { RequestEntity } from './entities/request.entity';
 
 @Controller('requests')
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
   @Post()
-  create(@Body() createRequestDto: CreateRequestDto) {
-    return this.requestsService.create(createRequestDto);
+  async create(@Body() createRequestDto: CreateRequestDto) {
+    return await this.requestsService.create(createRequestDto);
+  }
+
+  @Get('incomming')
+  @UseGuards(JwtAuthGuard)
+  async getIncommingRequests(@Request() req: TAuthResponse) {
+    return await this.requestsService.findIncomming(req.user.sub);
+  }
+
+  @Get('incomming/inProgress')
+  @UseGuards(JwtAuthGuard)
+  async getIncommingInProgressRequests(@Request() req: TAuthResponse) {
+    return await this.requestsService.findIncommingInProgress(req.user.sub);
+  }
+
+  @Get('outgoing')
+  @UseGuards(JwtAuthGuard)
+  async getOutgoingRequests(@Request() req: TAuthResponse) {
+    return await this.requestsService.findOutgoing(req.user.sub);
+  }
+
+  @Get('outgoing/inProgress')
+  @UseGuards(JwtAuthGuard)
+  async getOutgoingInProgressRequests(@Request() req: TAuthResponse) {
+    return await this.requestsService.findOutgoingInProgress(req.user.sub);
   }
 
   @Get()

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -11,10 +10,10 @@ import { dbConfiguration } from './config/db.config';
 import { IJwtConfig, jwtConfig } from './config/jwt.config';
 import { SkillsModule } from './skills/skills.module';
 import { UploadModule } from './upload/upload.module';
-import { CategoriesModule } from './categories/categories.module';
 import { RequestsModule } from './requests/requests.module';
 import { NotificationsGateway } from './notifications/notifications.gateway';
 import { NotificationsModule } from './notifications/notifications.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -35,7 +34,6 @@ import { NotificationsModule } from './notifications/notifications.module';
     UsersModule,
     SkillsModule,
     UploadModule,
-    CategoriesModule,
     RequestsModule,
     NotificationsModule,
   ],
