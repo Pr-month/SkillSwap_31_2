@@ -14,8 +14,8 @@ import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { JwtRolesGuard } from '../auth/guards/jwt-roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Request as RequestEntity } from './entities/request.entity';
 import { TAuthResponse } from '../auth/type';
+import { RequestEntity } from './entities/request.entity';
 
 @Controller('requests')
 export class RequestsController {

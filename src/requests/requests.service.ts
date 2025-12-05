@@ -1,22 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityNotFoundError, Repository } from 'typeorm';
-import { Request as RequestEntity } from './entities/request.entity';
 import { Role } from '../users/users.enums';
 import { checkRequestPermissions } from '../utils/checkUserRole';
 import { RequestStatus } from './requests.enums';
+import { RequestEntity } from './entities/request.entity';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class RequestsService {
   constructor(
-    @InjectRepository(Request)
+    @InjectRepository(RequestEntity)
     private requestRepository: Repository<RequestEntity>,
   ) {}
 

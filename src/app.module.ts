@@ -13,6 +13,7 @@ import { UploadModule } from './upload/upload.module';
 import { RequestsModule } from './requests/requests.module';
 import { NotificationsGateway } from './notifications/notifications.gateway';
 import { NotificationsModule } from './notifications/notifications.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -36,7 +37,6 @@ import { NotificationsModule } from './notifications/notifications.module';
     RequestsModule,
     NotificationsModule,
   ],
-  providers: [AppService],
   controllers: [AppController],
   providers: [AppService, NotificationsGateway],
 })
