@@ -1,5 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Request as RequestEntity } from '../requests/entities/request.entity';
+import { RequestEntity } from '../requests/entities/request.entity';
 import { Role } from '../users/users.enums';
 import { RequestStatus } from '../requests/requests.enums';
 

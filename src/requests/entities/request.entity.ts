@@ -13,7 +13,7 @@ import { RequestStatus } from '../requests.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
 
 @Entity('request')
-export class Request {
+export class RequestEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
