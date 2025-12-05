@@ -97,6 +97,7 @@ export class SkillsService {
     const skills = await this.skillsRepository.find({
       where: whereConditions,
       order: { id: 'DESC' },
+      relations: ['owner'],
       skip: offset,
       take: limit,
     });
@@ -114,7 +115,10 @@ export class SkillsService {
   }
 
   async findOne(id: number) {
-    const skill = await this.skillsRepository.findOne({ where: { id } });
+    const skill = await this.skillsRepository.findOne({
+      where: { id },
+      relations: ['owner'],
+    });
 
     if (!skill) {
       throw new NotFoundException(`Навык с ID ${id} не найден`);
