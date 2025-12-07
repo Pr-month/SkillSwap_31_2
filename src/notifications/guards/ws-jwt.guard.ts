@@ -1,9 +1,9 @@
 import { ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
-import { TJwtPayload } from 'src/auth/type';
-import { IJwtConfig, jwtConfig } from 'src/config/jwt.config';
-import { ExtendedSocket } from '../types';
+
+import { IJwtConfig, jwtConfig } from '../../config/jwt.config';
+import { ExtendedSocket, TJwtPayload } from '../../auth/type';
 
 @Injectable()
 export class WsJwtGuard {
