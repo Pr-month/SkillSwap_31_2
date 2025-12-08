@@ -11,6 +11,7 @@ export const adminData: Omit<User, 'id' | 'beforeInsert'> = {
   gender: UserGender.male,
   avatar: '',
   skills: [],
+  wantToLearn: [],
   favoriteSkills: [],
   role: Role.Admin,
   refreshToken: '',
