@@ -3,6 +3,7 @@ import {
   BeforeInsert,
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -60,6 +61,9 @@ export class User {
 
   /*@ManyToMany(() => Skill, skill => skill.users)
   wantToLearn: */
+  @ManyToMany(() => Skill, (skill) => skill.wantToLearnBy)
+  @JoinTable()
+  wantToLearn: Skill[];
 
   @ManyToMany(() => Skill, (skill) => skill.favoritedBy)
   favoriteSkills: Skill[];
