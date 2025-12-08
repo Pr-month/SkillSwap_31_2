@@ -75,6 +75,6 @@ export class User {
   })
   role: Role;
 
-  @Column()
-  refreshToken: string;
+  @Column({ type: 'varchar', nullable: true })
+  refreshToken?: string | null;
 }
