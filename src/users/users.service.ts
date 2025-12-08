@@ -11,12 +11,15 @@ import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Skill } from '../skills/entities/skill.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Skill)
+    private skillsRepository: Repository<Skill>,
   ) {}
 
   async create(user: CreateUserDto) {
@@ -91,5 +94,24 @@ export class UsersService {
 
   async findByEmail(email: string) {
     return await this.userRepository.findOne({ where: { email } });
+  }
+
+  async findUsersBySkill(skillId: number): Promise<User[]> {
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
+    if (!skill) throw new NotFoundException(`Навык с id ${skillId} не найден`);
+
+    const categoryId = skill.category.id;
+
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.wantToLearn', 'skill')
+      .where('skill.categoryId = :categoryId', { categoryId })
+      .distinct(true) // Убирает дублирование пользователей
+      .take(10)
+      .getMany();
+
+    return users;
   }
 }

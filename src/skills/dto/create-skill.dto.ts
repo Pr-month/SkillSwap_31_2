@@ -1,6 +1,6 @@
 export class CreateSkillDto {
   title: string;
   description: string;
-  category: string;
+  category: number;
   images: string[];
 }

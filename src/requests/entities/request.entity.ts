@@ -6,6 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { RequestStatus } from '../requests.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
@@ -44,4 +46,14 @@ export class RequestEntity {
     default: false,
   })
   isread: boolean;
+
+  @BeforeUpdate()
+  update() {
+    this.updatedAt = new Date();
+  }
+
+  @BeforeInsert()
+  create() {
+    this.updatedAt = new Date();
+  }
 }

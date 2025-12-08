@@ -3,12 +3,14 @@ import {
   BeforeInsert,
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserGender, Role } from '../users.enums';
+import { Role, UserGender } from '../users.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Entity('user')
 export class User {
@@ -46,7 +48,7 @@ export class User {
   city: string;
 
   @Column({
-    default: UserGender['not specified'],
+    default: UserGender.notSpecified,
     type: 'enum',
     enum: UserGender,
   })
@@ -58,8 +60,9 @@ export class User {
   @OneToMany(() => Skill, (skill) => skill.owner)
   skills?: Skill[];
 
-  /*@ManyToMany(() => Skill, skill => skill.users)
-  wantToLearn: */
+  @ManyToMany(() => Category)
+  @JoinTable()
+  wantToLearn: Category[];
 
   @ManyToMany(() => Skill, (skill) => skill.favoritedBy)
   favoriteSkills: Skill[];
@@ -71,6 +74,6 @@ export class User {
   })
   role: Role;
 
-  @Column()
-  refreshToken: string;
+  @Column({ type: 'varchar', nullable: true })
+  refreshToken?: string | null;
 }

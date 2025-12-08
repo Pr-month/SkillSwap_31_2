@@ -1,7 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
-import { RequestEntity } from '../requests/entities/request.entity';
 import { Role } from '../users/users.enums';
 import { RequestStatus } from '../requests/requests.enums';
+import { RequestEntity } from '../requests/entities/request.entity';
 
 export function checkRequestPermissions(
   request: RequestEntity,

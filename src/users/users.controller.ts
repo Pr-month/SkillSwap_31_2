@@ -23,16 +23,21 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: number) {
-    return await this.usersService.findOne(id);
-  }
-
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getCurrentUser(@Request() req: TAuthResponse) {
     const userId = req.user.sub;
     return this.usersService.getCurrentUser(userId);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: number) {
+    return await this.usersService.findOne(id);
+  }
+
+  @Get('by-skill/:id')
+  async findUsersBySkill(@Param('id') id: number) {
+    return await this.usersService.findUsersBySkill(id);
   }
 
   @Patch('me')

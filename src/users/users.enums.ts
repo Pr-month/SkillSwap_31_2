@@ -4,7 +4,7 @@ export enum Role {
 }
 
 export enum UserGender {
-  'male',
-  'female',
-  'not specified',
+  male = 'male',
+  female = 'female',
+  notSpecified = 'not specified',
 }

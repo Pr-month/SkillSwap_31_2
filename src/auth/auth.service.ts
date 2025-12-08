@@ -4,7 +4,11 @@ import * as bcrypt from 'bcryptjs';
 import { configuration, IConfig } from 'src/config/app.config';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
-import { IJwtConfig, jwtConfig } from 'src/config/jwt.config';
+import {
+  IJwtConfig,
+  jwtConfig as JwtConfigInjection,
+} from 'src/config/jwt.config';
+import { TJwtPayload } from './type';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @Inject(configuration.KEY)
     private readonly appConfig: IConfig,
-    @Inject(jwtConfig.KEY)
+    @Inject(JwtConfigInjection.KEY)
     private readonly jwtConfig: IJwtConfig,
   ) {}
 
@@ -21,7 +25,10 @@ export class AuthService {
     access_token: string;
     refresh_token: string;
   }> {
-    const payload = { sub: user.id };
+    const payload: TJwtPayload = {
+      sub: user.id,
+      role: user.role,
+    };
     const accessToken = this.jwtService.sign(payload, {
       secret: this.jwtConfig.secretToken,
       expiresIn: this.jwtConfig.secretExpiresIn,
