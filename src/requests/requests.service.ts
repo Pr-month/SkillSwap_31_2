@@ -7,6 +7,7 @@ import { checkRequestPermissions } from '../utils/checkUserRole';
 import { RequestStatus } from './requests.enums';
 import { RequestEntity } from './entities/request.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
 export class RequestsService {
@@ -15,9 +16,16 @@ export class RequestsService {
     private requestRepository: Repository<RequestEntity>,
   ) {}
 
+  private RequestGateway: NotificationsGateway;
+
   async create(createRequestDto: CreateRequestDto): Promise<RequestEntity> {
     const request = this.requestRepository.create(createRequestDto);
     await this.requestRepository.save(request);
+    this.RequestGateway.notifyUser(createRequestDto.receiver.id, {
+      type: createRequestDto.status,
+      skillName: createRequestDto.requestedSkill.title,
+      fromUserId: createRequestDto.sender.id,
+    });
     return request;
   }
 
