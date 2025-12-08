@@ -8,6 +8,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { WsJwtGuard } from './guards/ws-jwt.guard';
 
 @Module({
   imports: [PassportModule.register({ defaultStrategy: 'jwt' }), UsersModule],
@@ -19,7 +20,8 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
     JwtStrategy,
     JwtRefreshStrategy,
     LocalStrategy,
+    WsJwtGuard
   ],
-  exports: [JwtAuthGuard, JwtRefreshGuard, PassportModule],
+  exports: [JwtAuthGuard, JwtRefreshGuard, WsJwtGuard, PassportModule],
 })
 export class AuthModule {}
