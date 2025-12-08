@@ -29,7 +29,7 @@ export class UsersController {
     const userId = req.user.sub;
     return this.usersService.getCurrentUser(userId);
   }
-  
+
   @Get(':id')
   async findOne(@Param('id') id: number) {
     return await this.usersService.findOne(id);

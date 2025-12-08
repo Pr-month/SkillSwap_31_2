@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Role, UserGender } from '../users.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Entity('user')
 export class User {
@@ -59,11 +60,9 @@ export class User {
   @OneToMany(() => Skill, (skill) => skill.owner)
   skills?: Skill[];
 
-  /*@ManyToMany(() => Skill, skill => skill.users)
-  wantToLearn: */
-  @ManyToMany(() => Skill, (skill) => skill.wantToLearnBy)
+  @ManyToMany(() => Category)
   @JoinTable()
-  wantToLearn: Skill[];
+  wantToLearn: Category[];
 
   @ManyToMany(() => Skill, (skill) => skill.favoritedBy)
   favoriteSkills: Skill[];

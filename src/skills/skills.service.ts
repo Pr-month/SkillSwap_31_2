@@ -33,6 +33,7 @@ export class SkillsService {
     const skill = this.skillsRepository.create({
       ...createSkillDto,
       owner: { id: userId },
+      category: { id: createSkillDto.category },
     });
     return await this.skillsRepository.save(skill);
   }
