@@ -30,13 +30,13 @@ export class User {
   @Column()
   password: string;
 
-@BeforeInsert()
-async beforeInsert() {
-  if (this.password) {
-    const saltRounds = 10; // Фиксированное значение для простоты
-    this.password = await bcrypt.hash(this.password, saltRounds);
+  @BeforeInsert()
+  async beforeInsert() {
+    if (this.password) {
+      const saltRounds = 10; // Фиксированное значение для простоты
+      this.password = await bcrypt.hash(this.password, saltRounds);
+    }
   }
-}
 
   @Column()
   about: string;
@@ -64,7 +64,10 @@ async beforeInsert() {
   @JoinTable()
   wantToLearn: Category[];
 
-  @ManyToMany(() => Skill, (skill) => skill.favoritedBy)
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: 'user_favorite_skills',
+  })
   favoriteSkills: Skill[];
 
   @Column({

@@ -20,7 +20,7 @@ import { FindSkillsQueryDto } from './dto/find-skill.dto';
 
 @Controller('skills')
 export class SkillsController {
-  constructor(private readonly skillsService: SkillsService) {}
+  constructor(private readonly skillsService: SkillsService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -61,13 +61,6 @@ export class SkillsController {
     return this.skillsService.update(+id, updateSkillDto);
   }
 
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string, @Request() req: TAuthResponse) {
-    const userId = req.user.sub;
-    return this.skillsService.remove(+id, userId);
-  }
-
   @Delete('favorites/:id')
   @UseGuards(JwtAuthGuard)
   async removeToFavorites(
@@ -76,5 +69,12 @@ export class SkillsController {
   ): Promise<Skill> {
     const userId = req.user.sub;
     return await this.skillsService.removeToFavorites(+id, userId);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  remove(@Param('id') id: string, @Request() req: TAuthResponse) {
+    const userId = req.user.sub;
+    return this.skillsService.remove(+id, userId);
   }
 }
