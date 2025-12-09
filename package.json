@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed:categories": "ts-node -r tsconfig-paths/register src/scripts/seed-categories",
     "seed:admin": "ts-node -r tsconfig-paths/register src/scripts/seed-admin.ts",
-    "seed:users": "ts-node -r tsconfig-paths/register src/scripts/seed-users.ts"
+    "seed:users": "ts-node -r tsconfig-paths/register src/scripts/seed-users.ts",
+    "seed:skills": "ts-node -r tsconfig-paths/register src/scripts/seed-skills.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
