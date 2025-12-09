@@ -55,6 +55,7 @@ async function seedSkills(
         images: skillData.images,
         owner: owner,
         favoritedBy: [],
+        category: category,
       });
 
       await skillRepo.save(skill);
