@@ -32,10 +32,10 @@ export class User {
 
   @BeforeInsert()
   async beforeInsert() {
-    this.password = await bcrypt.hash(
-      this.password,
-      process.env.HASH_SALT || 10,
-    );
+    if (this.password) {
+      const saltRounds = 10; // Фиксированное значение для простоты
+      this.password = await bcrypt.hash(this.password, saltRounds);
+    }
   }
 
   @Column()
@@ -64,7 +64,10 @@ export class User {
   @JoinTable()
   wantToLearn: Category[];
 
-  @ManyToMany(() => Skill, (skill) => skill.favoritedBy)
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: 'user_favorite_skills',
+  })
   favoriteSkills: Skill[];
 
   @Column({

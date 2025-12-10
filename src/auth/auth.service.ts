@@ -19,7 +19,7 @@ export class AuthService {
     private readonly appConfig: IConfig,
     @Inject(JwtConfigInjection.KEY)
     private readonly jwtConfig: IJwtConfig,
-  ) {}
+  ) { }
 
   async auth(user: User): Promise<{
     access_token: string;
@@ -53,11 +53,17 @@ export class AuthService {
 
   async validatePassword(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
-    const hash = await bcrypt.hash(password, this.appConfig.hashSalt);
-    const matched = await bcrypt.compare(password, hash);
-    if (matched) {
+
+    if (!user) {
+      return null; // Пользователь не найден
+    }
+    // Сравниваем введённый пароль с хешем из базы данных
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
       return user;
     }
+
     return null;
   }
 }
