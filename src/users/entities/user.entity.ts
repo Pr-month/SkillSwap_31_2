@@ -11,6 +11,7 @@ import {
 import { Role, UserGender } from '../users.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('user')
 export class User {
@@ -27,6 +28,7 @@ export class User {
   })
   email: string;
 
+  @Exclude()
   @Column()
   password: string;
 
@@ -77,6 +79,7 @@ export class User {
   })
   role: Role;
 
+  @Exclude()
   @Column({ type: 'varchar', nullable: true })
   refreshToken?: string | null;
 }
