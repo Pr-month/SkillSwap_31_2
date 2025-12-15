@@ -19,7 +19,7 @@ export class AuthService {
     private readonly appConfig: IConfig,
     @Inject(JwtConfigInjection.KEY)
     private readonly jwtConfig: IJwtConfig,
-  ) { }
+  ) {}
 
   async auth(user: User): Promise<{
     access_token: string;
@@ -41,6 +41,13 @@ export class AuthService {
     return Promise.resolve({
       access_token: accessToken,
       refresh_token: refreshToken,
+    });
+  }
+
+  async logout(user: TJwtPayload): Promise<{ message: string }> {
+    await this.usersService.clearToken(user.sub);
+    return Promise.resolve({
+      message: 'Logout successfully',
     });
   }
 
