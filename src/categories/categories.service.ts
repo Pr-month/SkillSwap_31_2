@@ -17,14 +17,6 @@ export class CategoriesService {
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
-    const existingCategory = await this.categoriesRepository.findOne({
-      where: { name: createCategoryDto.name },
-    });
-
-    if (existingCategory) {
-      throw new ConflictException('Категория с таким названием уже существует');
-    }
-
     const category = new Category();
 
     category.name = createCategoryDto.name;
