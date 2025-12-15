@@ -88,6 +88,15 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
+  async updateToken(userId: number, token: string): Promise<void> {
+    const user = await this.findOne(userId);
+    if (user) {
+      this.userRepository.update(userId, {
+        refreshToken: token,
+      });
+    }
+  }
+
   remove(id: number) {
     return `This action removes a #${id} user`;
   }

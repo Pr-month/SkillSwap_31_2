@@ -6,6 +6,7 @@ import { LocalGuard } from './guards/local.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { User } from 'src/users/entities/user.entity';
 import { Request } from 'express';
+import { TJwtPayload } from './type';
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +31,7 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(JwtRefreshGuard)
   async refresh(@Req() req: Request) {
-    const user = req.user as User;
-    return await this.authService.auth(user);
+    const user = req.user as TJwtPayload;
+    return await this.authService.refreshToken(user);
   }
 }

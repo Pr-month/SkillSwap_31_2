@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { configuration, IConfig } from 'src/config/app.config';
@@ -19,7 +19,7 @@ export class AuthService {
     private readonly appConfig: IConfig,
     @Inject(JwtConfigInjection.KEY)
     private readonly jwtConfig: IJwtConfig,
-  ) { }
+  ) {}
 
   async auth(user: User): Promise<{
     access_token: string;
@@ -38,10 +38,23 @@ export class AuthService {
       expiresIn: this.jwtConfig.refreshExpiresIn,
     });
 
+    await this.usersService.updateToken(user.id, refreshToken);
+
     return Promise.resolve({
       access_token: accessToken,
       refresh_token: refreshToken,
     });
+  }
+
+  async refreshToken(tokenData: TJwtPayload): Promise<{
+    access_token: string;
+    refresh_token: string;
+  }> {
+    const user = await this.usersService.findOne(tokenData.sub);
+    if (!user) {
+      throw new ForbiddenException();
+    }
+    return this.auth(user);
   }
 
   generateTokens(user: User): Promise<{
