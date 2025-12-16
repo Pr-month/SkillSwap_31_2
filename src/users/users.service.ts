@@ -12,19 +12,38 @@ import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Skill } from '../skills/entities/skill.entity';
+import { Category } from '../categories/entities/category.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
     @InjectRepository(Skill)
     private skillsRepository: Repository<Skill>,
+
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
   ) {}
 
-  async create(user: CreateUserDto) {
-    const createdUser = this.userRepository.create(user);
-    return await this.userRepository.save(createdUser);
+  async create(dto: CreateUserDto) {
+    const { categoryId, ...userData } = dto;
+
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Категория не найдена');
+    }
+
+    const user = this.userRepository.create({
+      ...userData,
+      wantToLearn: [category],
+    });
+
+    return await this.userRepository.save(user);
   }
 
   async findAll(): Promise<User[]> {

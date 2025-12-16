@@ -3,7 +3,7 @@ import { AppDataSource } from '../config/db.config';
 import { Category } from '../categories/entities/category.entity';
 import { Categories } from './seed-categories.data';
 
-async function seedCategories(categoryRepo: Repository<Category>) {
+export async function seedCategories(categoryRepo: Repository<Category>) {
   const existing = await categoryRepo.count();
   if (existing > 0)
     console.log('Сид прерван: Категории уже есть в базе данных');

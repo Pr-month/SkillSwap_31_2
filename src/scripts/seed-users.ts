@@ -4,8 +4,13 @@ import { AppDataSource } from '../config/db.config';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { usersData } from './seed-users.data';
+import { Category } from '../categories/entities/category.entity';
+import { seedCategories } from './seed-categories';
 
-async function seedUsers(userRepo: Repository<User>) {
+async function seedUsers(
+  categoryRepo: Repository<Category>,
+  userRepo: Repository<User>,
+) {
   try {
     const count = await userRepo.count();
 
@@ -14,14 +19,26 @@ async function seedUsers(userRepo: Repository<User>) {
       return;
     }
 
+    const categories = await categoryRepo.find();
+
+    if (categories.length === 0) {
+      throw new Error('Категории не найдены. Сначала выполните сид категорий.');
+    }
+
     for (const data of usersData) {
+      const randomCategory =
+        categories[Math.floor(Math.random() * categories.length)];
+
       const user = userRepo.create({
         ...data,
+        wantToLearn: [randomCategory],
         refreshToken: '',
       });
 
       await userRepo.save(user);
-      console.log(`Создан пользователь: ${user.email}`);
+      console.log(
+        `Создан пользователь: ${user.email}, категория: ${randomCategory.name}`,
+      );
     }
 
     console.log('Сид выполнен: пользователи добавлены');
@@ -37,8 +54,11 @@ async function seed() {
     console.log('Database connection established');
 
     const userRepository = AppDataSource.getRepository(User);
+    const categoryRepository = AppDataSource.getRepository(Category);
 
-    await seedUsers(userRepository);
+    await seedCategories(categoryRepository);
+
+    await seedUsers(categoryRepository, userRepository);
   } catch (error) {
     console.error(error);
     process.exit(1);
