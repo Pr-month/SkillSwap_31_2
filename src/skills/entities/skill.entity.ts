@@ -1,4 +1,3 @@
-import { Category } from 'src/categories/entities/category.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -22,10 +21,10 @@ export class Skill {
   @Column()
   description: string;
 
-  @ManyToOne(() => Category, (category) => category.skills, {
+/*   @ManyToOne(() => Category, (category) => category.skills, {
     nullable: true,
   })
-  category: Category;
+  category: Category; */
 
   @ManyToOne(() => Category, { eager: true, nullable: false })
   @JoinColumn()

@@ -17,7 +17,7 @@ async function seedSkills(
     console.log('Начало сидинга навыков...');
 
     const users = await userRepo.find();
-    const userMap = new Map(users.map(user => [user.id, user]));
+    const userMap = new Map(users.map(user => [user.email, user]));
 
     const categories = await categoryRepo.find({
       relations: ['parent'],
@@ -35,9 +35,9 @@ async function seedSkills(
     });
 
     for (const skillData of skillsData) {
-      const owner = userMap.get(skillData.ownerId);
+      const owner = userMap.get(skillData.owner);
       if (!owner) {
-        console.warn(`Пользователь с id ${skillData.ownerId} не найден, пропускаем...`);
+        console.warn(`Пользователь с id ${skillData.owner} не найден, пропускаем...`);
         continue;
       }
 
