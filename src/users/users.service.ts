@@ -13,6 +13,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Skill } from '../skills/entities/skill.entity';
 import { Category } from '../categories/entities/category.entity';
+import { FindUsersQueryDto } from './dto/find-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -46,13 +47,42 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    const users = await this.userRepository.find();
+  async findAll(query: FindUsersQueryDto): Promise<{
+    users: User[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    const { page, limit } = query;
+    const offset = (page - 1) * limit;
 
-    if (!users) {
-      throw new NotFoundException('Список пользователей пуст');
+    const total = await this.userRepository.count();
+
+    const totalPages = Math.ceil(total / limit);
+
+    if (page > totalPages && total > 0) {
+      throw new NotFoundException(
+        `Страница ${page} не найдена. Всего страниц: ${totalPages}`,
+      );
     }
-    return users;
+
+    const users = await this.userRepository.find({
+      order: { id: 'DESC' },
+      skip: offset,
+      take: limit,
+      relations: ['wantToLearn'],
+    });
+
+    if (users.length === 0) {
+      throw new NotFoundException('Пользователи не найдены');
+    }
+
+    return {
+      users,
+      total,
+      page,
+      totalPages,
+    };
   }
 
   async findOne(id: number): Promise<User> {
