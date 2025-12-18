@@ -15,6 +15,9 @@ import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FindUsersQueryDto } from './dto/find-user.dto';
+import { JwtRolesGuard } from '../auth/guards/jwt-roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../users/users.enums';
 
 @Controller('users')
 export class UsersController {
@@ -61,7 +64,9 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @UseGuards(JwtRolesGuard)
+  @Roles(Role.Admin)
+  async remove(@Param('id') id: string): Promise<void> {
+    await this.usersService.remove(+id);
   }
 }

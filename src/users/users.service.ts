@@ -137,8 +137,20 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<void> {
+    if (!id || Number.isNaN(id)) {
+      throw new BadRequestException('Некорректный id пользователя');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Пользователь с id ${id} не найден`);
+    }
+
+    await this.userRepository.remove(user);
   }
 
   async findByEmail(email: string) {
