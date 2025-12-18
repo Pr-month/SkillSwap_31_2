@@ -1,12 +1,11 @@
-import { User } from 'src/users/entities/user.entity';
-import { RequestStatus } from '../requests.enums';
-import { Skill } from 'src/skills/entities/skill.entity';
+import { IsInt, IsPositive } from 'class-validator';
 
 export class CreateRequestDto {
-  sender: User;
-  receiver: User;
-  status: RequestStatus;
-  offeredSkill: Skill;
-  requestedSkill: Skill;
-  isread: boolean;
+  @IsInt()
+  @IsPositive()
+  offeredSkill: number;
+
+  @IsInt()
+  @IsPositive()
+  requestedSkill: number;
 }
