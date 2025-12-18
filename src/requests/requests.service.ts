@@ -7,18 +7,64 @@ import { checkRequestPermissions } from '../utils/checkUserRole';
 import { RequestStatus } from './requests.enums';
 import { RequestEntity } from './entities/request.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Skill } from 'src/skills/entities/skill.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class RequestsService {
   constructor(
     @InjectRepository(RequestEntity)
     private requestRepository: Repository<RequestEntity>,
+
+    @InjectRepository(Skill)
+    private skillRepository: Repository<Skill>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
-  async create(createRequestDto: CreateRequestDto): Promise<RequestEntity> {
-    const request = this.requestRepository.create(createRequestDto);
-    await this.requestRepository.save(request);
-    return request;
+  async create(
+    senderId: number,
+    dto: CreateRequestDto,
+  ): Promise<RequestEntity> {
+    const offeredSkill = await this.skillRepository.findOne({
+      where: { id: dto.offeredSkill },
+      relations: ['owner'],
+    });
+
+    if (!offeredSkill) {
+      throw new NotFoundException('Offered skill не найден');
+    }
+
+    const requestedSkill = await this.skillRepository.findOne({
+      where: { id: dto.requestedSkill },
+      relations: ['owner'],
+    });
+
+    if (!requestedSkill) {
+      throw new NotFoundException('Requested skill не найден');
+    }
+
+    const sender = await this.userRepository.findOne({
+      where: { id: senderId },
+    });
+
+    if (!sender) {
+      throw new NotFoundException('Отправитель не найден');
+    }
+
+    const receiver = requestedSkill.owner;
+
+    const request = this.requestRepository.create({
+      sender,
+      receiver,
+      offeredSkill,
+      requestedSkill,
+      status: RequestStatus.pending,
+      isread: false,
+    });
+
+    return await this.requestRepository.save(request);
   }
 
   async findIncomming(userId: number): Promise<RequestEntity[]> {
