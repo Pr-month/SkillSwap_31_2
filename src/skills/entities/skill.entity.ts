@@ -21,8 +21,10 @@ export class Skill {
   @Column()
   description: string;
 
-  // @ManyToOne(() => Category, (category) => category.skils)
-  // category: Category;
+/*   @ManyToOne(() => Category, (category) => category.skills, {
+    nullable: true,
+  })
+  category: Category; */
 
   @ManyToOne(() => Category, { eager: true, nullable: false })
   @JoinColumn()

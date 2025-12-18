@@ -56,7 +56,7 @@ async function seed() {
     const userRepository = AppDataSource.getRepository(User);
     const categoryRepository = AppDataSource.getRepository(Category);
 
-    await seedCategories(categoryRepository);
+    // await seedCategories(categoryRepository);
 
     await seedUsers(categoryRepository, userRepository);
   } catch (error) {
