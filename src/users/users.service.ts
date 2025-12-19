@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import * as bcrypt from 'bcryptjs';
@@ -132,7 +132,17 @@ export class UsersService {
   async updateMe(userId: number, dto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(userId);
 
-    Object.assign(user, dto);
+    if (dto.wantToLearnCategories) {
+      if (dto.wantToLearnCategories.length > 0) {
+        const categories = await this.categoryRepository.findBy({
+          id: In(dto.wantToLearnCategories),
+        });
+        if (categories.length !== dto.wantToLearnCategories.length) {
+          throw new NotFoundException('Ошибка задания id категорий');
+        }
+        user.wantToLearn = categories;
+      } else user.wantToLearn = [];
+    } else Object.assign(user, dto);
 
     return await this.userRepository.save(user);
   }
