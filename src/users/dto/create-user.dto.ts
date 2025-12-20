@@ -7,4 +7,5 @@ export class CreateUserDto {
   city: string;
   avatar: string;
   categoryId: number;
+  wantToLearnCategories?: string[];
 }
