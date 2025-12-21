@@ -19,7 +19,7 @@ export class AuthService {
     private readonly appConfig: IConfig,
     @Inject(JwtConfigInjection.KEY)
     private readonly jwtConfig: IJwtConfig,
-  ) { }
+  ) {}
 
   async auth(user: User): Promise<{
     access_token: string;
