@@ -6,7 +6,14 @@ import { LocalGuard } from './guards/local.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { User } from 'src/users/entities/user.entity';
 import { Request } from 'express';
+import {
+  AuthControllerSwagger,
+  AuthLoginSwagger,
+  AuthRefreshSwagger,
+  AuthRegisterSwagger,
+} from './auth.swagger';
 
+@AuthControllerSwagger()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -14,12 +21,14 @@ export class AuthController {
     private readonly usersService: UsersService,
   ) {}
 
+  @AuthRegisterSwagger()
   @Post('register')
   async register(@Body() createAuthDto: CreateAuthDto) {
     const user = await this.usersService.create(createAuthDto);
     return await this.authService.auth(user);
   }
 
+  @AuthLoginSwagger()
   @UseGuards(LocalGuard)
   @Post('login')
   async login(@Req() req: Request) {
@@ -27,6 +36,7 @@ export class AuthController {
     return await this.authService.auth(user);
   }
 
+  @AuthRefreshSwagger()
   @Post('refresh')
   @UseGuards(JwtRefreshGuard)
   async refresh(@Req() req: Request) {
