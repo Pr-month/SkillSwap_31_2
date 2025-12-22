@@ -21,7 +21,7 @@ export class Skill {
   @Column()
   description: string;
 
-/*   @ManyToOne(() => Category, (category) => category.skills, {
+  /*   @ManyToOne(() => Category, (category) => category.skills, {
     nullable: true,
   })
   category: Category; */

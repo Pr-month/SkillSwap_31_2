@@ -1,10 +1,11 @@
-import { Categories } from "./seed-categories.data";
-import { usersData } from "./seed-users.data";
+import { Categories } from './seed-categories.data';
+import { usersData } from './seed-users.data';
 
 export const skillsData = [
   {
     title: 'Управление творческими проектами',
-    description: 'Планирование и управление проектами в сфере искусства и творчества',
+    description:
+      'Планирование и управление проектами в сфере искусства и творчества',
     images: ['', ''],
     owner: usersData[0].email,
     categoryName: Categories[0].name,
@@ -12,7 +13,8 @@ export const skillsData = [
   },
   {
     title: 'Разработка на React',
-    description: 'Современная разработка на React с использованием TypeScript, Hooks и Redux',
+    description:
+      'Современная разработка на React с использованием TypeScript, Hooks и Redux',
     images: ['', ''],
     owner: usersData[0].email,
     categoryName: Categories[1].name,
@@ -20,11 +22,12 @@ export const skillsData = [
   },
   {
     title: 'Графический дизайн',
-    description: 'Создание логотипов, брендбуков и полиграфии в Adobe Illustrator',
+    description:
+      'Создание логотипов, брендбуков и полиграфии в Adobe Illustrator',
     images: ['', ''],
     owner: usersData[0].email,
     categoryName: Categories[2].name,
-    subcategoryName: Categories[2].children[0], 
+    subcategoryName: Categories[2].children[0],
   },
   {
     title: 'Личная финансовая грамотность',
