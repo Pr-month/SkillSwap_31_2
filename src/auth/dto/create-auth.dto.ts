@@ -2,7 +2,9 @@ import {
   IsDateString,
   IsEmail,
   IsEnum,
+  IsInt,
   IsNotEmpty,
+  IsPositive,
   IsString,
   IsUrl,
   MaxLength,
@@ -57,6 +59,10 @@ export class CreateAuthDto {
   @MinLength(5)
   @MaxLength(1024)
   avatar: string;
+
+  @IsInt()
+  @IsPositive()
+  categoryId: number;
   /*
   @IsArray()
   @IsNotEmpty()
