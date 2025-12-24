@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtRolesGuard } from './jwt-roles.guard';
 import { ROLES_KEY } from '../decorators/roles.decorator';
-import { Role } from '../../users/users.enums'; // Убедитесь, что путь верный
+import { Role } from '../../users/users.enums';
 
 const mockSuperCanActivate = jest.fn();
 
