@@ -1,4 +1,4 @@
-import { Inject, UseGuards } from '@nestjs/common';
+import { Inject, UseGuards, forwardRef } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -14,9 +14,14 @@ import { RequestsService } from '../requests/requests.service';
 import { TJwtPayload } from '../auth/type';
 
 @UseGuards(WsJwtGuard)
-@WebSocketGateway()
+@WebSocketGateway(Number(process.env.NOTIFICATIONS_WS_PORT) || 4000, {
+  cors: {
+    origin: '*',
+    credentials: true,
+  },
+})
 export class NotificationsGateway implements OnGatewayConnection {
-  @Inject()
+  @Inject(forwardRef(() => RequestsService))
   requestsService: RequestsService;
 
   @WebSocketServer()

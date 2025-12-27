@@ -6,7 +6,7 @@ import { Role } from '../users/users.enums';
 import { checkRequestPermissions } from '../utils/checkUserRole';
 import { RequestStatus } from './requests.enums';
 import { RequestEntity } from './entities/request.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, forwardRef, Inject } from '@nestjs/common';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
@@ -14,9 +14,9 @@ export class RequestsService {
   constructor(
     @InjectRepository(RequestEntity)
     private requestRepository: Repository<RequestEntity>,
+    @Inject(forwardRef(() => NotificationsGateway))
+    private RequestGateway: NotificationsGateway
   ) {}
-
-  private RequestGateway: NotificationsGateway;
 
   async create(createRequestDto: CreateRequestDto): Promise<RequestEntity> {
     const request = this.requestRepository.create(createRequestDto);
