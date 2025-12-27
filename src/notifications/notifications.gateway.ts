@@ -1,17 +1,15 @@
-import { Inject, UseGuards, forwardRef } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import {
+  OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer,
-  OnGatewayConnection,
-  WsException,
+  WebSocketServer
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { WsJwtGuard } from './guards/ws-jwt.guard';
-import { SendRequestDto } from './dto/sendRequest.dto';
-import { RequestStatus } from '../requests/requests.enums';
-import { RequestsService } from '../requests/requests.service';
 import { TJwtPayload } from '../auth/type';
+import { RequestStatus } from '../requests/requests.enums';
+import { SendRequestDto } from './dto/sendRequest.dto';
+import { WsJwtGuard } from './guards/ws-jwt.guard';
 
 @UseGuards(WsJwtGuard)
 @WebSocketGateway(Number(process.env.NOTIFICATIONS_WS_PORT) || 4000, {
@@ -21,9 +19,6 @@ import { TJwtPayload } from '../auth/type';
   },
 })
 export class NotificationsGateway implements OnGatewayConnection {
-  @Inject(forwardRef(() => RequestsService))
-  requestsService: RequestsService;
-
   @WebSocketServer()
   server: Server;
 
@@ -37,10 +32,6 @@ export class NotificationsGateway implements OnGatewayConnection {
   async handleAccepted(client: Socket, payload: SendRequestDto) {
     const data = client.data as { user: TJwtPayload };
     const { sub } = data.user;
-    const requests = await this.requestsService.findIncomming(sub);
-    if (!requests.find((request) => request.sender.id == payload.fromUserId)) {
-      throw new WsException('Пользователь не найден');
-    }
 
     this.notifyUser(sub, payload);
   }
@@ -49,10 +40,6 @@ export class NotificationsGateway implements OnGatewayConnection {
   async handleRejected(client: Socket, payload: SendRequestDto) {
     const data = client.data as { user: TJwtPayload };
     const { sub } = data.user;
-    const requests = await this.requestsService.findIncomming(sub);
-    if (!requests.find((request) => request.sender.id == payload.fromUserId)) {
-      throw new WsException('Пользователь не найден');
-    }
 
     this.notifyUser(sub, payload);
   }
