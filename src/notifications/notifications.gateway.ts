@@ -1,18 +1,18 @@
 import { UseGuards } from '@nestjs/common';
 import {
+  OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer,
-  OnGatewayConnection,
-  WsException,
+  WebSocketServer
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { WsJwtGuard } from './guards/ws-jwt.guard';
-import { SendRequestDto } from './dto/sendRequest.dto';
-import { RequestStatus } from '../requests/requests.enums';
 import { TJwtPayload } from '../auth/type';
+import { RequestStatus } from '../requests/requests.enums';
 import { SocketWithUser } from './type';
 import {JwtPayload} from "jsonwebtoken";
+import { WsException } from '@nestjs/websockets';
+import { WsJwtGuard } from './guards/ws-jwt.guard';
+import { SendRequestDto } from './dto/sendRequest.dto';
 
 @UseGuards(WsJwtGuard)
 @WebSocketGateway(Number(process.env.NOTIFICATIONS_WS_PORT) || 4000, {
