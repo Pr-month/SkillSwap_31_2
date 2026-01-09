@@ -1,6 +1,5 @@
 import { UseGuards } from '@nestjs/common';
 import {
-  OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer
@@ -21,37 +20,19 @@ import { SendRequestDto } from './dto/sendRequest.dto';
     credentials: true,
   },
 })
-export class NotificationsGateway implements OnGatewayConnection {
+export class NotificationsGateway {
 
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    this.server.emit('auth', client);
-  }
-
   @SubscribeMessage('auth')
   handleAuth(client: SocketWithUser) {
-    const data = client.data as { user: JwtPayload };
+    const data = client.data;
     const { sub } = data.user;
     if(!sub){
       throw new WsException('Пользователь не найден');
     }
     client.join(sub.toString());
-  }
-
-  @SubscribeMessage('accepted')
-  async handleAccepted(client: Socket, payload: SendRequestDto) {
-    const data = client.data as { user: TJwtPayload };
-    const { sub } = data.user;
-    this.notifyUser(sub, payload);
-  }
-
-  @SubscribeMessage('rejected')
-  async handleRejected(client: Socket, payload: SendRequestDto) {
-    const data = client.data as { user: TJwtPayload };
-    const { sub } = data.user;
-    this.notifyUser(sub, payload);
   }
 
   notifyUser(userId: number, payload: SendRequestDto) {
