@@ -8,25 +8,67 @@ import { RequestStatus } from './requests.enums';
 import { RequestEntity } from './entities/request.entity';
 import { Injectable, NotFoundException, forwardRef, Inject } from '@nestjs/common';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { Skill } from 'src/skills/entities/skill.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class RequestsService {
   constructor(
     @InjectRepository(RequestEntity)
     private requestRepository: Repository<RequestEntity>,
-    @Inject(forwardRef(() => NotificationsGateway))
-    private RequestGateway: NotificationsGateway
+    @InjectRepository(Skill)
+    private skillRepository: Repository<Skill>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
-  async create(createRequestDto: CreateRequestDto): Promise<RequestEntity> {
-    const request = this.requestRepository.create(createRequestDto);
-    await this.requestRepository.save(request);
-    this.RequestGateway.notifyUser(createRequestDto.receiver.id, {
+  async create(
+    senderId: number,
+    dto: CreateRequestDto,
+  ): Promise<RequestEntity> {
+    const offeredSkill = await this.skillRepository.findOne({
+      where: { id: dto.offeredSkill },
+      relations: ['owner'],
+    });
+
+    if (!offeredSkill) {
+      throw new NotFoundException('Offered skill не найден');
+    }
+
+    const requestedSkill = await this.skillRepository.findOne({
+      where: { id: dto.requestedSkill },
+      relations: ['owner'],
+    });
+
+    if (!requestedSkill) {
+      throw new NotFoundException('Requested skill не найден');
+    }
+
+    const sender = await this.userRepository.findOne({
+      where: { id: senderId },
+    });
+
+    if (!sender) {
+      throw new NotFoundException('Отправитель не найден');
+    }
+
+    const receiver = requestedSkill.owner;
+
+    const request = this.requestRepository.create({
+      sender,
+      receiver,
+      offeredSkill,
+      requestedSkill,
+      status: RequestStatus.pending,
+      isread: false,
+    });
+ this.RequestGateway.notifyUser(createRequestDto.receiver.id, {
       type: createRequestDto.status,
       skillName: createRequestDto.requestedSkill.title,
       fromUserId: createRequestDto.sender.id,
     });
-    return request;
+    return await this.requestRepository.save(request);
   }
 
   async findIncomming(userId: number): Promise<RequestEntity[]> {

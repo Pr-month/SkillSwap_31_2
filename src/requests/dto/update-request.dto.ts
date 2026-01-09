@@ -1,4 +1,12 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateRequestDto } from './create-request.dto';
+import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { RequestStatus } from '../requests.enums';
 
-export class UpdateRequestDto extends PartialType(CreateRequestDto) {}
+export class UpdateRequestDto {
+  @IsOptional()
+  @IsEnum(RequestStatus)
+  status?: RequestStatus;
+
+  @IsOptional()
+  @IsBoolean()
+  isread?: boolean;
+}

@@ -11,6 +11,7 @@ import {
 import { Role, UserGender } from '../users.enums';
 import { Skill } from 'src/skills/entities/skill.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('user')
 export class User {
@@ -27,15 +28,16 @@ export class User {
   })
   email: string;
 
+  @Exclude()
   @Column()
   password: string;
 
   @BeforeInsert()
   async beforeInsert() {
-    this.password = await bcrypt.hash(
-      this.password,
-      process.env.HASH_SALT || 10,
-    );
+    if (this.password) {
+      const saltRounds = 10; // Фиксированное значение для простоты
+      this.password = await bcrypt.hash(this.password, saltRounds);
+    }
   }
 
   @Column()
@@ -64,7 +66,10 @@ export class User {
   @JoinTable()
   wantToLearn: Category[];
 
-  @ManyToMany(() => Skill, (skill) => skill.favoritedBy)
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: 'user_favorite_skills',
+  })
   favoriteSkills: Skill[];
 
   @Column({
@@ -74,6 +79,7 @@ export class User {
   })
   role: Role;
 
+  @Exclude()
   @Column({ type: 'varchar', nullable: true })
   refreshToken?: string | null;
 }

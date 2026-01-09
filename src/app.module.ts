@@ -14,6 +14,8 @@ import { RequestsModule } from './requests/requests.module';
 import { NotificationsGateway } from './notifications/notifications.gateway';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AppController } from './app.controller';
+import { CategoriesModule } from './categories/categories.module';
+import { CitiesModule } from './cities/cities.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { AppController } from './app.controller';
     UploadModule,
     NotificationsModule,
     RequestsModule,
+    CategoriesModule,
+    CitiesModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationsGateway],
