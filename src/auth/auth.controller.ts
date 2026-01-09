@@ -25,7 +25,11 @@ export class AuthController {
   @Post('register')
   async register(@Body() createAuthDto: CreateAuthDto) {
     const user = await this.usersService.create(createAuthDto);
-    return await this.authService.auth(user);
+    const tokens = await this.authService.auth(user);
+    await this.usersService.updateMe(user.id, {
+      refresh: tokens.refresh_token,
+    });
+    return tokens;
   }
 
   @AuthLoginSwagger()
@@ -33,7 +37,11 @@ export class AuthController {
   @Post('login')
   async login(@Req() req: Request) {
     const user = req.user as User;
-    return await this.authService.auth(user);
+    const tokens = await this.authService.auth(user);
+    await this.usersService.updateMe(user.id, {
+      refresh: tokens.refresh_token,
+    });
+    return tokens;
   }
 
   @AuthRefreshSwagger()
