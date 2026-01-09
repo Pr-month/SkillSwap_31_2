@@ -10,6 +10,7 @@ import { Injectable, NotFoundException, forwardRef, Inject } from '@nestjs/commo
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { Skill } from 'src/skills/entities/skill.entity';
 import { User } from 'src/users/entities/user.entity';
+import { SendRequestDto } from 'src/notifications/dto/sendRequest.dto';
 
 @Injectable()
 export class RequestsService {
@@ -18,10 +19,11 @@ export class RequestsService {
     private requestRepository: Repository<RequestEntity>,
     @InjectRepository(Skill)
     private skillRepository: Repository<Skill>,
-
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) {}
+    @Inject(forwardRef(() => NotificationsGateway))
+    private RequestGateway: NotificationsGateway
+  ) { }
 
   async create(
     senderId: number,
@@ -63,10 +65,11 @@ export class RequestsService {
       status: RequestStatus.pending,
       isread: false,
     });
- this.RequestGateway.notifyUser(createRequestDto.receiver.id, {
-      type: createRequestDto.status,
-      skillName: createRequestDto.requestedSkill.title,
-      fromUserId: createRequestDto.sender.id,
+
+    this.RequestGateway.notifyUser(receiver.id, {
+      type: RequestStatus.pending,
+      skillName: offeredSkill.title,
+      fromUserId: sender.id
     });
     return await this.requestRepository.save(request);
   }
