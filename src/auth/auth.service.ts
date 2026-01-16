@@ -46,6 +46,12 @@ export class AuthService {
     });
   }
 
+  async logout(user: TJwtPayload): Promise<{ message: string }> {
+    await this.usersService.clearToken(user.sub);
+    return Promise.resolve({
+      message: 'Logout successfully',
+    });
+}
   async refreshToken(tokenData: TJwtPayload): Promise<{
     access_token: string;
     refresh_token: string;

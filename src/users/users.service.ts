@@ -194,4 +194,13 @@ export class UsersService {
 
     return users;
   }
+
+  async clearToken(userId: number): Promise<void> {
+    const user = await this.findOne(userId);
+    if (user) {
+      await this.userRepository.update(userId, {
+        refreshToken: '',
+      });
+    }
+  }
 }
