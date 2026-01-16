@@ -8,16 +8,16 @@ import { Repository } from 'typeorm';
 import { usersData } from './seed-users.data';
 import { skillsData } from './seed-skills.data';
 
-
 async function seedSkills(
   skillRepo: Repository<Skill>,
   userRepo: Repository<User>,
-  categoryRepo: Repository<Category>) {
+  categoryRepo: Repository<Category>,
+) {
   try {
     console.log('Начало сидинга навыков...');
 
     const users = await userRepo.find();
-    const userMap = new Map(users.map(user => [user.id, user]));
+    const userMap = new Map(users.map((user) => [user.email, user]));
 
     const categories = await categoryRepo.find({
       relations: ['parent'],
@@ -26,7 +26,7 @@ async function seedSkills(
     const parentCategoryMap = new Map<string, Category>();
     const childCategoryMap = new Map<string, Category>();
 
-    categories.forEach(category => {
+    categories.forEach((category) => {
       if (!category.parent) {
         parentCategoryMap.set(category.name, category);
       } else {
@@ -35,9 +35,11 @@ async function seedSkills(
     });
 
     for (const skillData of skillsData) {
-      const owner = userMap.get(skillData.ownerId);
+      const owner = userMap.get(skillData.owner);
       if (!owner) {
-        console.warn(`Пользователь с id ${skillData.ownerId} не найден, пропускаем...`);
+        console.warn(
+          `Пользователь с id ${skillData.owner} не найден, пропускаем...`,
+        );
         continue;
       }
 
@@ -61,7 +63,6 @@ async function seedSkills(
       await skillRepo.save(skill);
       console.log('Сидинг навыков успешно создан!');
     }
-
   } catch (error) {
     console.error('Ошибка при создании навыков:', error);
     throw error;

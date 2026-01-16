@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -13,16 +14,33 @@ import { TAuthResponse } from '../auth/type';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FindUsersQueryDto } from './dto/find-user.dto';
+import { JwtRolesGuard } from '../auth/guards/jwt-roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../users/users.enums';
+import {
+  UsersControllerSwagger,
+  UsersFindAllSwagger,
+  UsersFindBySkillSwagger,
+  UsersFindOneSwagger,
+  UsersGetMeSwagger,
+  UsersRemoveSwagger,
+  UsersUpdateMeSwagger,
+  UsersUpdatePasswordSwagger,
+} from './users.swagger';
 
+@UsersControllerSwagger()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UsersFindAllSwagger()
   @Get()
-  async findAll() {
-    return await this.usersService.findAll();
+  async findAll(@Query() query: FindUsersQueryDto) {
+    return this.usersService.findAll(query);
   }
 
+  @UsersGetMeSwagger()
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getCurrentUser(@Request() req: TAuthResponse) {
@@ -30,16 +48,19 @@ export class UsersController {
     return this.usersService.getCurrentUser(userId);
   }
 
+  @UsersFindOneSwagger()
   @Get(':id')
   async findOne(@Param('id') id: number) {
     return await this.usersService.findOne(id);
   }
 
+  @UsersFindBySkillSwagger()
   @Get('by-skill/:id')
   async findUsersBySkill(@Param('id') id: number) {
     return await this.usersService.findUsersBySkill(id);
   }
 
+  @UsersUpdateMeSwagger()
   @Patch('me')
   @UseGuards(JwtAuthGuard)
   async updateMe(@Request() req: TAuthResponse, @Body() dto: UpdateUserDto) {
@@ -47,6 +68,7 @@ export class UsersController {
     return this.usersService.updateMe(userId, dto);
   }
 
+  @UsersUpdatePasswordSwagger()
   @Patch('me/password')
   @UseGuards(JwtAuthGuard)
   async updateUserPassword(
@@ -58,8 +80,11 @@ export class UsersController {
     return { message: 'Пароль успешно изменен' };
   }
 
+  @UsersRemoveSwagger()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @UseGuards(JwtRolesGuard)
+  @Roles(Role.Admin)
+  async remove(@Param('id') id: string): Promise<void> {
+    await this.usersService.remove(+id);
   }
 }

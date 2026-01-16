@@ -5,35 +5,84 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-user-password.dto';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Skill } from '../skills/entities/skill.entity';
+import { Category } from '../categories/entities/category.entity';
+import { FindUsersQueryDto } from './dto/find-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
     @InjectRepository(Skill)
     private skillsRepository: Repository<Skill>,
+
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
   ) {}
 
-  async create(user: CreateUserDto) {
-    const createdUser = this.userRepository.create(user);
-    return await this.userRepository.save(createdUser);
+  async create(dto: CreateUserDto) {
+    const { categoryId, ...userData } = dto;
+
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Категория не найдена');
+    }
+
+    const user = this.userRepository.create({
+      ...userData,
+      wantToLearn: [category],
+    });
+
+    return await this.userRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    const users = await this.userRepository.find();
+  async findAll(query: FindUsersQueryDto): Promise<{
+    users: User[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    const { page, limit } = query;
+    const offset = (page - 1) * limit;
 
-    if (!users) {
-      throw new NotFoundException('Список пользователей пуст');
+    const total = await this.userRepository.count();
+
+    const totalPages = Math.ceil(total / limit);
+
+    if (page > totalPages && total > 0) {
+      throw new NotFoundException(
+        `Страница ${page} не найдена. Всего страниц: ${totalPages}`,
+      );
     }
-    return users;
+
+    const users = await this.userRepository.find({
+      order: { id: 'DESC' },
+      skip: offset,
+      take: limit,
+      relations: ['wantToLearn'],
+    });
+
+    if (users.length === 0) {
+      throw new NotFoundException('Пользователи не найдены');
+    }
+
+    return {
+      users,
+      total,
+      page,
+      totalPages,
+    };
   }
 
   async findOne(id: number): Promise<User> {
@@ -83,7 +132,17 @@ export class UsersService {
   async updateMe(userId: number, dto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(userId);
 
-    Object.assign(user, dto);
+    if (dto.wantToLearnCategories) {
+      if (dto.wantToLearnCategories.length > 0) {
+        const categories = await this.categoryRepository.findBy({
+          id: In(dto.wantToLearnCategories),
+        });
+        if (categories.length !== dto.wantToLearnCategories.length) {
+          throw new NotFoundException('Ошибка задания id категорий');
+        }
+        user.wantToLearn = categories;
+      } else user.wantToLearn = [];
+    } else Object.assign(user, dto);
 
     return await this.userRepository.save(user);
   }
@@ -97,8 +156,20 @@ export class UsersService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<void> {
+    if (!id || Number.isNaN(id)) {
+      throw new BadRequestException('Некорректный id пользователя');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Пользователь с id ${id} не найден`);
+    }
+
+    await this.userRepository.remove(user);
   }
 
   async findByEmail(email: string) {
