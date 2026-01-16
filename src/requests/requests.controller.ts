@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -22,8 +22,10 @@ export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
   @Post()
-  async create(@Body() createRequestDto: CreateRequestDto) {
-    return await this.requestsService.create(createRequestDto);
+  @UseGuards(JwtAuthGuard)
+  async create(@Request() req: TAuthResponse, @Body() dto: CreateRequestDto) {
+    const senderId = req.user.sub;
+    return this.requestsService.create(senderId, dto);
   }
 
   @Get('incomming')
