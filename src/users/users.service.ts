@@ -147,6 +147,15 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
+  async updateToken(userId: number, token: string): Promise<void> {
+    const user = await this.findOne(userId);
+    if (user) {
+      this.userRepository.update(userId, {
+        refreshToken: token,
+      });
+    }
+  }
+
   async remove(id: number): Promise<void> {
     if (!id || Number.isNaN(id)) {
       throw new BadRequestException('Некорректный id пользователя');
@@ -184,5 +193,14 @@ export class UsersService {
       .getMany();
 
     return users;
+  }
+
+  async clearToken(userId: number): Promise<void> {
+    const user = await this.findOne(userId);
+    if (user) {
+      await this.userRepository.update(userId, {
+        refreshToken: '',
+      });
+    }
   }
 }

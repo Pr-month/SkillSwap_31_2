@@ -6,6 +6,8 @@ import { LocalGuard } from './guards/local.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { User } from 'src/users/entities/user.entity';
 import { Request } from 'express';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { TJwtPayload } from './type';
 import {
   AuthControllerSwagger,
   AuthLoginSwagger,
@@ -25,7 +27,11 @@ export class AuthController {
   @Post('register')
   async register(@Body() createAuthDto: CreateAuthDto) {
     const user = await this.usersService.create(createAuthDto);
-    return await this.authService.auth(user);
+    const tokens = await this.authService.auth(user);
+    await this.usersService.updateMe(user.id, {
+      refresh: tokens.refresh_token,
+    });
+    return tokens;
   }
 
   @AuthLoginSwagger()
@@ -33,14 +39,25 @@ export class AuthController {
   @Post('login')
   async login(@Req() req: Request) {
     const user = req.user as User;
-    return await this.authService.auth(user);
+    const tokens = await this.authService.auth(user);
+    await this.usersService.updateMe(user.id, {
+      refresh: tokens.refresh_token,
+    });
+    return tokens;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  async logout(@Req() req: Request) {
+    const user = req.user as TJwtPayload;
+    return this.authService.logout(user);
   }
 
   @AuthRefreshSwagger()
   @Post('refresh')
   @UseGuards(JwtRefreshGuard)
   async refresh(@Req() req: Request) {
-    const user = req.user as User;
-    return await this.authService.auth(user);
+    const user = req.user as TJwtPayload;
+    return await this.authService.refreshToken(user);
   }
 }

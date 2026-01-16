@@ -15,6 +15,7 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AppController } from './app.controller';
 import { CategoriesModule } from './categories/categories.module';
+import { CitiesModule } from './cities/cities.module';
 
 @Module({
   imports: [
@@ -35,9 +36,10 @@ import { CategoriesModule } from './categories/categories.module';
     UsersModule,
     SkillsModule,
     UploadModule,
-    RequestsModule,
     NotificationsModule,
+    RequestsModule,
     CategoriesModule,
+    CitiesModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationsGateway],
